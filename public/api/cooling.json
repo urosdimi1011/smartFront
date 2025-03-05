@@ -1,0 +1,21 @@
+[
+    {
+        "id":1,
+        "name":"Dnevna soba"
+    },
+    {
+        "id":2,
+        "name":"Spavaca Soba",
+        "temperature" : 30
+    },
+    {
+        "id":3,
+        "name":"Kupatilo",
+        "temperature" : 20
+    },
+    {
+        "id":4,
+        "name":"Sprat",
+        "temperature" : 15
+    }
+]

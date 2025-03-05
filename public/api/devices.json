@@ -1,0 +1,18 @@
+[
+    {
+        "id":1,
+        "name":"Klima"
+    },
+    {
+        "id":2,
+        "name":"Svetlo u kupatilu"
+    },
+    {
+        "id":3,
+        "name":"Lampa u sobi"
+    },
+    {
+        "id":4,
+        "name":"Grejalica"
+    }
+]
