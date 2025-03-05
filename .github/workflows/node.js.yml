@@ -36,3 +36,12 @@ jobs:
 
     - name: Build project
       run: npm run build --if-present
+      
+    - name: Deploy to FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./dist/  # Ovo je folder gde Vue pravi build fajlove
+        server-dir: /public_html/smartera.razmenidom.com/  # Postavi gde treba fajlovi da idu na hostingu
