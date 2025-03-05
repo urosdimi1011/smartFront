@@ -20,7 +20,7 @@
     "vue-chart-3": "^3.1.8",
     "vue-router": "^4.0.3",
     "vue-toastification": "^2.0.0-rc.5",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.0",
     "vee-validate": "^4.0.0",
     "yup": "^1.0.0"
   },
