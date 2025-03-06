@@ -192,7 +192,6 @@ const editingRows = ref([]);
 
 const onRowEditSave = async (event) => {
     let { newData } = event;
-    // console.log(newData);
     const dataForSend = {
         "name": newData.name,
         "time": newData.time,
@@ -210,7 +209,7 @@ const onRowEditSave = async (event) => {
         });
     }
     catch (error) {
-        toast.error(error.response.data.message, {
+        toast.error(error.message, {
             timeout: 3000
         })
     }

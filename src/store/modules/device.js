@@ -42,13 +42,7 @@ export default {
                 return response;
             }
             catch (error) {
-                if (error.response) {
-                    console.error("Response error:", error.response.status, error.response.data);
-                } else {
-                    console.error("Network error:", error.message);
-                }
-
-                throw error;
+                throw Error(error.message);
             }
 
         },

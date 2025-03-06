@@ -1,21 +1,25 @@
 <template>
     <div @click.stop="toggleActive()" :data-id="data.id" class="lamp background-block" :class="{ active: active }">
-        <template v-if="data.category.name == 'Plug' && data.status == 0">
-            <PhPlugs :size="48" />
-        </template>
-        <template v-if="data.category.name=='Plug' && data.status">
-            <PhPlugsConnected :size="48" />
-        </template>
-        <template v-if="data.category.name!='Plug'">
-            <i :class="data.category.icon"></i>
-        </template>
-        <div v-if="showInputField" class="name-block">
-            <p>{{ data.name }}</p>
-        </div>
-        <div @click.stop v-else class="form-change-input">
-            <!-- <span @click.stop="changeNameOfInput()"><i class="fa-solid fa-xmark"></i></span> -->
-            <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
-            <ButtonMy @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
+        <div class="content-up">
+            <div>
+                <template v-if="data.category.name == 'Plug' && data.status == 0">
+                    <PhPlugs :size="48" />
+                </template>
+                <template v-if="data.category.name == 'Plug' && data.status">
+                    <PhPlugsConnected :size="48" />
+                </template>
+                <template v-if="data.category.name != 'Plug'">
+                    <i :class="data.category.icon"></i>
+                </template>
+                <div v-if="showInputField" class="name-block">
+                    <p>{{ data.name }}</p>
+                </div>
+                <div @click.stop v-else class="form-change-input">
+                    <!-- <span @click.stop="changeNameOfInput()"><i class="fa-solid fa-xmark"></i></span> -->
+                    <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
+                    <ButtonMy @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
+                </div>
+            </div>
         </div>
         <div class="content-down">
             <!-- <hr class="line"/> -->
@@ -47,7 +51,7 @@
 import { ref, defineProps, onUpdated } from 'vue';
 import modalLayout from '../modalLayout.vue';
 import { showModal } from '../../composables/modal'
-import { PhPlugs,PhPlugsConnected } from "@phosphor-icons/vue";
+import { PhPlugs, PhPlugsConnected } from "@phosphor-icons/vue";
 const { isOpen, show, close, confirm, modalContent } = showModal();
 // Ovo je globalan objekat sa podacima
 import store from '@/store';
@@ -167,6 +171,7 @@ async function changeName() {
 .content-down {
     position: relative;
     border-top: 1px solid black;
+    padding: 0px 10px;
 }
 
 .content-down i {
@@ -197,7 +202,7 @@ async function changeName() {
 }
 
 .content-conf i {
-    padding: 0px 10px;
+    padding: 0px;
     color: white;
     font-size: 20px;
 }
@@ -219,6 +224,13 @@ async function changeName() {
 
 .down-button:has(>.rotate) {
     padding-top: 10px;
+}
+
+.content-up {
+    min-height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* .line{

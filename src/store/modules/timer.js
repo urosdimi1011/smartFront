@@ -22,7 +22,7 @@ export default {
                 return response;
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         },
         async getAll({commit}){
@@ -32,7 +32,7 @@ export default {
                 return response;
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         },
         async changeTimer({dispatch},payload){
@@ -42,7 +42,7 @@ export default {
                 return response;
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         },
         async deleteTimer({dispatch},payload){
@@ -52,7 +52,7 @@ export default {
                 return response;
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         }
      

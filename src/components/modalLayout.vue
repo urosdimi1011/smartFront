@@ -4,7 +4,6 @@
       <div class="modal-content" :style="{width : (currentStepProps ? (currentStepProps.width || width) : width)}" @click.stop>
         <header class="modal-header">
           <slot name="header">
-            <!-- RESI OVO POSLE NE MOZE OVAKO DA OSTANE! -->
             <h2>{{ title }}</h2>
           </slot>
           <button @click="close" class="modal-close">X</button>

@@ -8,6 +8,7 @@ import 'primeicons/primeicons.css';
 import Toast from 'vue-toastification';
 import Button from './components/ui/ButtonMy.vue';
 import 'vue-toastification/dist/index.css';
+import './registerServiceWorker'
 // import Toast from "vue-toastification"
 const app = createApp(App);
 app.component('ButtonMy', Button);

@@ -42,9 +42,9 @@
 
     <div class="main-moj container">
 
-      <router-view v-slot="{ Component }">
+      <router-view :key="$route.fullPath" v-slot="{ Component }">
         <transition name="smooth-fade" mode="out-in">
-          <component :is="Component" :key="$route.fullPath" v-if="Component" />
+          <component :is="Component" v-if="Component" />
         </transition>
       </router-view>
     </div>
@@ -56,7 +56,7 @@
         <i class="fa-regular fa-clock"></i>
         <p>Tajmer</p>
       </div>
-      <div class="lamp background-block">
+      <div @click="showUserModal()" class="lamp background-block">
         <i class="fa-solid fa-user"></i>
         <p>Korisnicki profil</p>
       </div>
@@ -68,12 +68,20 @@
         <TimerView @close="close()" />
       </template> -->
       <!-- {{ a.currentStepIndex }} -->
-      <template #steps="{ nextStep, hasNext, previousStep }">
+      <template v-if="components.length > 1" #steps="{ nextStep, hasNext, previousStep }">
         <ButtonMy v-if="hasNext()" @click="nextStep()" class="form-button">Pogledaj listu dodatih tajmera </ButtonMy>
         <ButtonMy v-else @click="previousStep()" class="form-button">Vrati se na dodavanje tajmera </ButtonMy>
       </template>
+      <!-- <template></template> -->
     </modal-layout>
+    <!-- <modal-layout :visible="isOpen" @close="close()">
+      <template #header>
+        <h2>Informacije o korisniku</h2>
+      </template>
+      <template #body>
 
+      </template>
+    </modal-layout> -->
 
 
   </div>
@@ -90,6 +98,7 @@ import TimerTable from './components/layout/TimerTable.vue';
 import Skeleton from 'primevue/skeleton';
 const { isOpen, show, close } = showModal();
 import store from '@/store';
+import UserView from './views/UserView.vue';
 const components = shallowRef([{ component: TimerView }, { component: TimerTable, props: { width: "1300px" } }]);
 const stepIndex = ref(0);
 const route = useRoute();
@@ -107,9 +116,22 @@ const getAllCategories = async () => {
 }
 
 function isActive(path) {
-  return route.path === path;
+  const split = route.path.toLocaleLowerCase().split(path.toLocaleLowerCase())[0];
+  // console.log(split,route.path.toLocaleLowerCase(),path.toLocaleLowerCase());
+  if(split === route.path){
+    return path === route.path;
+  }
+  else{
+    return route.path.toLocaleLowerCase().includes(path.toLocaleLowerCase());
+  }
 }
 function showTimerModal() {
+  components.value = [{ component: TimerView }, { component: TimerTable, props: { width: "1300px" } }];
+  show();
+}
+
+const showUserModal = () => {
+  components.value = [{ component: UserView }];
   show();
 }
 onMounted(() => {
@@ -203,7 +225,7 @@ a {
   width: 20%;
   border-radius: 5px;
   text-align: center;
-  padding: 20px 10px 7px 10px;
+  padding: 20px 0px 7px 0px;
   cursor: pointer;
   transition: all 300ms;
   border: 1px solid transparent;
@@ -740,7 +762,24 @@ button:active {
   gap: 20px;
   align-items: center;
 }
-
+@media only screen and (max-width: 1200px){
+  .lamp{
+    width: 40%;
+  }
+}
+@media only screen and (max-width: 900px) {
+  .header-group{
+    font-size: 25px;
+  }
+}
+@media only screen and (max-width: 760px) {
+  .header-group{
+    font-size: 20px;
+  }
+  .group-content{
+    width: 90%;
+  }
+}
 
 @media only screen and (max-width: 600px) {
   .login-form {
@@ -748,7 +787,12 @@ button:active {
     height: 470px;
     left: 53%;
   }
-
+  .group-content{
+    width: 95%;
+  }
+  .add-group p{
+    font-size: 15px !important;
+  }
   .shape:first-child {
     background: url("../public/img/android-chrome-192x192.png");
     background-repeat: no-repeat;
@@ -844,7 +888,8 @@ button:active {
 .color-danger {
   color: rgb(255, 0, 93);
 }
-.header-text{
+
+.header-text {
   text-align: center;
   font-size: 30px;
   color: white;
