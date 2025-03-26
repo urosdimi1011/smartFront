@@ -22,11 +22,8 @@
     "vue-chart-3": "^3.1.8",
     "vue-router": "^4.0.3",
     "vue-toastification": "^2.0.0-rc.5",
+    "vue3-touch-events": "^5.0.13",
     "vuex": "^4.0.0",
-<<<<<<< HEAD
-=======
-    "vee-validate": "^4.0.0",
->>>>>>> 3a3c407e12a48b5159695e38e62bb33bc1d29820
     "yup": "^1.0.0"
   },
   "devDependencies": {

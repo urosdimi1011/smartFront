@@ -12,7 +12,7 @@
             <div v-if="idGrupe">
                 <FormInput id="idGrupe" name="idGrupe" type="hidden" v-model="id_group" />
             </div>
-            <button @click.prevent="showAdvancedSettings()">Napredna podesavanja</button>
+            <ButtonMy class="w-30" @click.prevent="showAdvancedSettings()">Napredna podesavanja</ButtonMy>
             <transition name="slidedown">
                 <div v-if="showAdvanced" class="advanced-settings">
                     <FormInput id="pin" name="pin" label="Pin" :model-value="2" />
@@ -65,10 +65,10 @@ const id_group = ref(props.idGrupe);
 const tempLink = ref('');
 
 const schema = yup.object({
-    ssid: yup.string().required(),
-    wifiPassword: yup.string().required(),
-    name: yup.string().required(),
-    id_category: yup.number().required(),
+    ssid: yup.string().required("Morate uneti SSID"),
+    wifiPassword: yup.string().required("Morate uneti lozinku"),
+    name: yup.string().required("Morate uneti ime uredjaja"),
+    id_category: yup.number().required("Morate odabrati kategoriju uredjaja"),
     pin: yup.number().min(0).max(9).typeError('Pin mora biti jednocifren broj'),
     board: yup.number().min(10000, 'Board mora imati tačno 5 cifara')
     .max(99999, 'Board mora imati tačno 5 cifara')
@@ -105,7 +105,9 @@ span {
     margin: 10px 0;
     color: rgba(255, 0, 0, 0.9);
 }
-
+.w-30{
+    width: 50%;
+}
 input,
 button {
     padding: 10px 10px;

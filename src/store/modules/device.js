@@ -18,10 +18,10 @@ export default {
     },
     actions: {
         async addDevice(_commit, payload) {
-                const response = await api.post('/api/device', payload);
-                // commit('setUser',response.data.user);
-                // commit('setJwtToken',response.data.token);
-                return response;
+            const response = await api.post('/api/device', payload);
+            // commit('setUser',response.data.user);
+            // commit('setJwtToken',response.data.token);
+            return response;
         },
         async getAllDevices({ commit }) {
             try {
@@ -35,7 +35,7 @@ export default {
         },
         async changeStatusOfDevice({ dispatch }, { id, status }) {
             try {
-                const response = await api.patch(`/api/device/status/${id}`, { status });
+                const response = await api.get(`/api/device/status/${id}?status=${Number(status)}`);
                 // Da li ovo moze drugacije da se resi????
                 await dispatch("group/getAllGroup", null, { root: true });
                 await dispatch("getAllDevices");
@@ -43,6 +43,7 @@ export default {
             }
             catch (error) {
                 throw Error(error.message);
+
             }
 
         },
@@ -81,14 +82,14 @@ export default {
                 throw Error(error.message);
             }
         },
-        async deleteDevice({dispatch},{id}){
-            try{
+        async deleteDevice({ dispatch }, { id }) {
+            try {
                 const response = await api.delete(`/api/device/${id}`);
                 await dispatch("group/getAllGroup", null, { root: true });
                 await dispatch("getAllDevices");
                 return response;
             }
-            catch(error){
+            catch (error) {
                 throw Error(error.message);
             }
         }

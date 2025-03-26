@@ -44,8 +44,19 @@ const groups = computed(() => {
     // console.log(store.getters['group/getAllDevicesOfGroup'](props.idGrupe))
     return store.getters['group/getAllDevicesOfGroup'](props.idGrupe);
 })
-const schema = yup.object({
-    devices: yup.array().of(yup.string()).min(1, "Morate odabrati bar jedan uređaj."),
+const schema = yup.object().shape({
+  devices: yup.array()
+      .test(
+          "at-least-one-checked",
+          "Morate odabrati bar jedan uređaj",
+          (devices) => {
+            // Ako nema uređaja (checkboxova), validacija prolazi
+            if (!devices || devices.length === 0) return true;
+
+            // Ako ima uređaja, proveri da li je bar jedan čekiran (true)
+            return devices.some(device => device === true);
+          }
+      )
 });
 // OVO JE NOVO I OBRATI PAZNJU NA OVO STO JE DODATO!!
 const { validate } = useForm({
@@ -56,9 +67,11 @@ const { value: devices } = useField('devices');
 
 const deviceOptions = ref([]);
 
-defineExpose({ validate });
+defineExpose({ validate});
 
 function isValidSync(data) {
+  console.log("asdad");
+
     try {
         schema.validateSync(data); // Ako nije validno, baca grešku
         return true; // Ako validacija uspe

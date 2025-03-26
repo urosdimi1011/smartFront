@@ -1,7 +1,7 @@
 <template>
-    <div @click.stop="toggleActive()" :data-id="data.id" class="lamp background-block" :class="{ active: active }">
-        <div class="content-up">
-            <div>
+    <div @click.stop="!data.is_out_of_range ? toggleActive() : null" :data-id="data.id" class="lamp background-block" :class="{ active: active,offline : data.is_out_of_range }">
+       <div class="content-up">
+         <div>
                 <template v-if="data.category.name == 'Plug' && data.status == 0">
                     <PhPlugs :size="48" />
                 </template>
@@ -14,11 +14,15 @@
                 <div v-if="showInputField" class="name-block">
                     <p>{{ data.name }}</p>
                 </div>
-                <div @click.stop v-else class="form-change-input">
+                <div @click.stop v-if="!showInputField && !data.is_out_of_range" class="form-change-input">
                     <!-- <span @click.stop="changeNameOfInput()"><i class="fa-solid fa-xmark"></i></span> -->
                     <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
                     <ButtonMy @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
                 </div>
+              <div v-if="data.is_out_of_range" class="outOfRange">
+                <p>Uredjaj je van mreže</p>
+                <p><PhWifiX :size="32" /></p>
+              </div>
             </div>
         </div>
         <div class="content-down">
@@ -27,7 +31,7 @@
                     class="fa-solid fa-arrow-down"></i></button>
             <transition name="slidedown" mode="out-in">
                 <div @click.stop v-if="doShowAdcConf" class="content-conf">
-                    <button @click.stop="removeDevice()">
+                  <button @click.stop="removeDevice()">
                         <span><i class="fa-solid fa-trash"></i></span>
                     </button>
                     <button @click.stop="changeNameOfInput()">
@@ -51,7 +55,7 @@
 import { ref, defineProps, onUpdated } from 'vue';
 import modalLayout from '../modalLayout.vue';
 import { showModal } from '../../composables/modal'
-import { PhPlugs, PhPlugsConnected } from "@phosphor-icons/vue";
+import { PhPlugs, PhPlugsConnected,PhWifiX } from "@phosphor-icons/vue";
 const { isOpen, show, close, confirm, modalContent } = showModal();
 // Ovo je globalan objekat sa podacima
 import store from '@/store';
@@ -75,7 +79,7 @@ async function toggleActive() {
     try {
         const data = {
             status: !active.value,
-            id: props.data.id
+            id: props.data.board
         };
         await store.dispatch('device/changeStatusOfDevice', data);
         // active.value = props.data.status;
@@ -146,7 +150,28 @@ async function changeName() {
 .form-change-input button i {
     font-size: 25px;
 }
-
+.outOfRange{
+  position: absolute;
+  top:0;
+  z-index: 1;
+  width:100%;
+  left: 0;
+}
+.outOfRange p{
+  color:black;
+  text-align: center;
+  width:100%;
+}
+.lamp.offline {
+  background-color: #ffe6e6;
+  color: #d32f2f;
+  border: 2px solid #f44336;
+  animation: blink 1s infinite alternate;
+}
+@keyframes blink {
+  0% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
 /* button{
     margin-top: 20px !important;
 } */
@@ -231,6 +256,7 @@ async function changeName() {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 /* .line{

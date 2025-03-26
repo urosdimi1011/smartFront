@@ -1,4 +1,5 @@
 import api from "@/config/axios";
+import router from "@/router";
 
 export default {
     namespaced: true,
@@ -35,7 +36,6 @@ export default {
             delete api.defaults.headers.common["Authorization"];
             localStorage.removeItem("token");
             localStorage.removeItem("user");
-
         },
         logout(state) {
             state.user = null;
@@ -62,7 +62,8 @@ export default {
                 throw Error(error);
             }
             commit("removeToken");
-        },
+            await router.push("/login");
+            },
         async registerUser(_commit, payload) {
             try {
                 const response = await api.post('/api/register', payload);
@@ -83,6 +84,7 @@ export default {
             }
             catch (error) {
                 console.error("Greška pri osvežavanju tokena:", error);
+                router.push("/login");
                 commit("removeToken");
                 return false;
             }

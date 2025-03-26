@@ -1,9 +1,9 @@
 <template>
   <!-- {{ allCategories }} -->
-  <div class="login-background">
+  <div v-if="isOnline" class="login-background">
     <div class="tabs background-block">
       <router-link to="/" exact v-slot="{ isActive }">
-        <input id="home" type="radio" name="tabsMenu" :class="{ active: isActive }" checked />
+        <input id="home" type="radio" name="tabsMenu" :class="{ active: isActive }" />
       </router-link>
       <!-- <template v-for="cat in allCategories"> -->
       <router-link v-for="cat in allCategories" :key="cat.id"
@@ -40,13 +40,13 @@
       </div>
     </div>
 
-    <div class="main-moj container">
+    <div v-touch:swipe.left="nextPage" v-touch:swipe.right="prevPage" class="main-moj container">
+      <transition name="slide" mode="out-in">
+          <router-view :key="$route.fullPath" v-slot="{ Component }">
+              <component :is="Component"  v-if="Component" />
+          </router-view>
+      </transition>
 
-      <router-view :key="$route.fullPath" v-slot="{ Component }">
-        <transition name="smooth-fade" mode="out-in">
-          <component :is="Component" v-if="Component" />
-        </transition>
-      </router-view>
     </div>
 
 
@@ -84,16 +84,22 @@
     </modal-layout> -->
 
 
+
+
+  </div>
+  <div v-else>
+    <OfflineView/>
   </div>
 </template>
 
 
 <script setup>
-import { useRoute } from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import modalLayout from '@/components/modalLayout.vue';
 import TimerView from '@/views/TimerView.vue';
+import OfflineView from '@/views/OfflineView.vue';
 import { showModal } from '@/composables/modal';
-import { shallowRef, ref, onMounted, computed } from 'vue';
+import { shallowRef, ref, onMounted, computed,onUnmounted } from 'vue';
 import TimerTable from './components/layout/TimerTable.vue';
 import Skeleton from 'primevue/skeleton';
 const { isOpen, show, close } = showModal();
@@ -102,11 +108,16 @@ import UserView from './views/UserView.vue';
 const components = shallowRef([{ component: TimerView }, { component: TimerTable, props: { width: "1300px" } }]);
 const stepIndex = ref(0);
 const route = useRoute();
+const router = useRouter();
 // const categories = ref(null);
 // const showAnother = ()=>{
 //   stepIndex.value++;
 // }
 
+const isOnline = ref(navigator.onLine);
+const updateOnlineStatus = () => {
+  isOnline.value = navigator.onLine;
+};
 const allCategories = computed(() => {
   return store.getters['category/getListOfCategories'];
 })
@@ -116,14 +127,14 @@ const getAllCategories = async () => {
 }
 
 function isActive(path) {
-  const split = route.path.toLocaleLowerCase().split(path.toLocaleLowerCase())[0];
-  // console.log(split,route.path.toLocaleLowerCase(),path.toLocaleLowerCase());
-  if(split === route.path){
-    return path === route.path;
+  const currentPath = route.path.toLowerCase();
+  const targetPath = path.toLowerCase();
+
+  if (targetPath === "/") {
+    return currentPath === "/"; // Home je aktivan samo kada je tačno /
   }
-  else{
-    return route.path.toLocaleLowerCase().includes(path.toLocaleLowerCase());
-  }
+
+  return currentPath.startsWith(targetPath);
 }
 function showTimerModal() {
   components.value = [{ component: TimerView }, { component: TimerTable, props: { width: "1300px" } }];
@@ -136,18 +147,50 @@ const showUserModal = () => {
 }
 onMounted(() => {
   getAllCategories();
+  window.addEventListener("online", updateOnlineStatus);
+  window.addEventListener("offline", updateOnlineStatus);
 })
+
+onUnmounted(() => {
+  window.removeEventListener("online", updateOnlineStatus);
+  window.removeEventListener("offline", updateOnlineStatus);
+});
 const routeLink = (cat) => {
   return cat.name === 'Heating/Cooling' ? 'Temperature' : cat.name
 }
+
+
+
+const nextPage = () => {
+  if (router.currentRoute.value.path === '/') {
+    router.push('/light/1'); // Idi na sledeću stranicu
+  } else if (router.currentRoute.value.path === '/light/1') {
+    router.push('/plug/2');
+  }
+  else if (router.currentRoute.value.path === '/plug/2') {
+    router.push('/temperature');
+  }
+};
+
+const prevPage = () => {
+  if (router.currentRoute.value.path === '/temperature') {
+    router.push('/plug/2'); // Vrati se nazad
+  } else if (router.currentRoute.value.path === '/plug/2') {
+    router.push('/light/1');
+  }
+  else if (router.currentRoute.value.path === '/light/1') {
+    router.push('/');
+  }
+}
+
+
+
+
+
 </script>
 
 
 <style>
-/* @import "tailwindcss";
-@import "tailwindcss/components";
-@import "./primevue/tailwind.css";
-@import "tailwindcss/utilities"; */
 * {
   margin: 0px;
   padding: 0px;
@@ -233,21 +276,18 @@ a {
   color: #fff;
 }
 
-.slidedown-enter-active,
-.slidedown-leave-active {
-  transition: max-height 0.5s ease-in-out;
+.slide-enter-active, .slide-leave-active {
+  transition: transform 0.4s ease-in-out, opacity 0.4s;
 }
 
-.slidedown-enter-to,
-.slidedown-leave-from {
-  overflow: hidden;
-  max-height: 1000px;
+.slide-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
 }
 
-.slidedown-enter-from,
-.slidedown-leave-to {
-  overflow: hidden;
-  max-height: 0;
+.slide-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
 }
 
 .lamp h2 {
@@ -327,6 +367,8 @@ a {
   background-color: rgba(255, 255, 255, 0.13);
   border: 2px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  //-webkit-filter: blur(10px);
   box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
   /* padding: 20px 10px 20px 10px !; */
 }
@@ -893,5 +935,8 @@ button:active {
   text-align: center;
   font-size: 30px;
   color: white;
+}
+body,html{
+  overflow-x:hidden ;
 }
 </style>

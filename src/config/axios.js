@@ -2,7 +2,7 @@ import axios from 'axios';
 import store from '@/store'; // Importuj Vuex store
 
 const instance = axios.create({
-    baseURL: 'https://smarteraback.razmenidom.com/',  // Ovde stavite svoju osnovnu URL adresu
+    baseURL: 'http://127.0.0.1:8000/',  // Ovde stavite svoju osnovnu URL adresu
     timeout: 10000,  // Timeout za zahteve (10 sekundi)
     headers: {
         'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ instance.interceptors.request.use(config => {
     return Promise.reject(error);
 });
 instance.interceptors.response.use(response => response, async error => {
-    if (error.response && error.response.status === 401) {
+    if (error.response && error.response.status === 401 && localStorage.getItem('token')) {
         try {
             const refreshResponse = await store.dispatch('user/refreshToken');
             if (refreshResponse) {

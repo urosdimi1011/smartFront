@@ -25,7 +25,7 @@ import FormInput from '../../components/ui/FormInput.vue';
 //Za rucno validiranje!!
 
 const schema = yup.object({
-    grupaUredjaja: yup.string().required()
+    grupaUredjaja: yup.string().required("Morate uneti ime grupe")
 });
 const props = defineProps({
     previousValue: {
@@ -42,11 +42,11 @@ defineExpose({validate });
 
 
 async function validate () {
-    try {
-        schema.validateSync(formValues);  // Sinhrona validacija
+  try {// Sinhrona validacija
+     schema.validateSync(formValues);
         return {valid : true};  // Ako validacija uspe
     } catch (error) {
-        return {valid : false};  // Ako validacija ne uspe
+    return {valid : false,errors: error.errors};  // Ako validacija ne uspe
     }
 }
 

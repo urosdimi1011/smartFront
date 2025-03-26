@@ -20,7 +20,7 @@
           <p>Kreiraj novi uredjaj</p>
         </div>
       </div>
-      <group-items :devices="devicesAll" groupName="Lista svih uredjaja" automaticOpen="true" :showButtonOfTurnAll="false"></group-items>
+      <group-items :devices="devicesAll" groupName="Lista svih uredjaja" automaticOpen="true" :showButtonOfTurnAll="false" :addDeviceOptions="false"></group-items>
       <Teleport to="body">
         <modal-layout :visible="isOpen" @close="closeAll()" :steps="condicional ? newDevica : steps"
           @getDatas="setToStepRecivedData" @finish="sendAllData">

@@ -2,12 +2,12 @@
         <div class="group-items background-block"
             :class="{ scale: isClass || automaticOpen, glowEffect: devicesAllTurn }">
             <div class="header-group-content">
-                <button class="remove-group" @click="confirmDelete()">X</button>
+                <button v-if="showButtonOfTurnAll" class="remove-group" @click="confirmDelete()">X</button>
                 <h3 class="header-group">{{ groupName }}</h3>
                 
                 <ButtonMy v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll"><input :id="'activeAllItems' + id" :checked="devicesAllTurn" disabled class="moje2" :class="{moje : devicesAllTurn}"
                         type="checkbox" /><label :for="'activeAllItems' + id" class="arrowPravi"
-                        @click="turnOnAll($event)"></label></ButtonMy>
+                        @click.stop="turnOnAll($event)"></label></ButtonMy>
 
             </div>
             <div class="line-block">
@@ -26,7 +26,7 @@
                     <template v-else>
                         <p class="text-info">Trenutno nemate uredjaje u grupi</p>
                     </template>
-                    <div class="w-100 d-flex-center">
+                    <div v-if="addDeviceOptions" class="w-100 d-flex-center">
                         <div class="lamp background-block" @click="show()">
                             <a href="#"><i class="fa-solid fa-plus"></i></a>
                         </div>
@@ -88,6 +88,10 @@ const props = defineProps({
         required: false,
         defualt: false
     },
+    addDeviceOptions:{
+      required : false,
+      default: true
+    },
     groupName: String,
     id: Number,
     idDevice: Number,
@@ -108,10 +112,9 @@ const devicesAllTurn = computed(()=>{
     return false;
 });
 const setNewForms = (selectedForms) => activeForms.value = selectedForms;
-function turnOnAll(e) {
-    e.stopPropagation();
+function turnOnAll() {
     activeForms.value = null;
-    shouldTurnOn.value = devicesProba.value.filter(device => device.status).length < devicesProba.value.length / 2;
+    shouldTurnOn.value = devicesProba.value.filter(device => device.status).length!==devicesProba.value.length;
     show(`Da li da zelite sve uredjaje da ${shouldTurnOn.value ? 'upalite' : 'ugasite'}?`, turnAllDevice);
 }
 

@@ -9,10 +9,14 @@ import Toast from 'vue-toastification';
 import Button from './components/ui/ButtonMy.vue';
 import 'vue-toastification/dist/index.css';
 import './registerServiceWorker'
+import Vue3TouchEvents from 'vue3-touch-events';
+
+
 // import Toast from "vue-toastification"
 const app = createApp(App);
 app.component('ButtonMy', Button);
 app.use(Toast);
+app.use(Vue3TouchEvents);
 app.use(PrimeVue,{
     theme: {
         preset: Aura,
