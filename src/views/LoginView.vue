@@ -6,7 +6,7 @@
                 <FormInput name="email" label="Unesite email" />
                 <FormInput type="password" name="password" label="Unesite password" />
                 <strong>Nemate nalog? <router-link :to="'Register'">Registruj</router-link></strong>
-                <ButtonMy>Uloguj se</ButtonMy>
+                <ButtonMy class="set-width">Uloguj se</ButtonMy>
                 <p v-if="errorMsg">{{ errorMsg }}</p>
             </Form>
         </div>
@@ -61,7 +61,9 @@ const submit = async (values) => {
     height: 100%;
     z-index: 1;
 }
-
+.set-width{
+  width: 100%;
+}
 body {
     overflow: hidden !important;
 }

@@ -19,7 +19,8 @@
                     <FormInput id="board" name="board" label="Board" :model-value="randomNumber" />
                 </div>
             </transition>
-            <ButtonMy class="form-button">Unesite uredjaj </ButtonMy>
+          <ButtonMy @click="openWiFiSettings">Otvori WiFi podešavanja</ButtonMy>
+          <ButtonMy class="form-button">Unesite uredjaj </ButtonMy>
             <p v-if="errorMsg">{{ errorMsg }}</p>
 
 
@@ -98,6 +99,21 @@ const showAdvancedSettings = () => {
 const showLink = () => {
     window.location.href = tempLink.value;
 }
+
+const  openWiFiSettings = ()=> {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+  if (/android/i.test(userAgent)) {
+    // Ako je Android, otvori WiFi podešavanja
+    window.location.href = "intent://#Intent;action=android.settings.WIFI_SETTINGS;end;";
+  } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+    // Ako je iOS, otvori WiFi podešavanja (možda ograničeno)
+    window.location.href = "prefs:root=WIFI";
+  } else {
+    alert("Vaš uređaj ne podržava automatsko otvaranje WiFi podešavanja.");
+  }
+}
+
 </script>
 <style scoped>
 span {
@@ -123,6 +139,8 @@ input {
     color: black;
     border: 1px solid black;
     padding: 5px 10px;
+    width: 100%;
+    margin-top: 25px;
 }
 
 .form-group label {

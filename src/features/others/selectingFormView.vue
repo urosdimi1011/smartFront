@@ -1,5 +1,5 @@
 <template>
-     <ButtonMy v-for="(index,value) in textOnButtons" :key="value" @click="showForms(showModals[value])">
+     <ButtonMy class="button-width" v-for="(index,value) in textOnButtons" :key="value" @click="showForms(showModals[value])">
         {{index}}
      </ButtonMy>
 </template>
@@ -23,3 +23,8 @@ const showForms = (selectedDevice)=>{
 }
 
 </script>
+<style scoped>
+.button-width{
+  width: 100%;
+}
+</style>

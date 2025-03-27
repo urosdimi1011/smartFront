@@ -2,12 +2,12 @@
         <div class="group-items background-block"
             :class="{ scale: isClass || automaticOpen, glowEffect: devicesAllTurn }">
             <div class="header-group-content">
-                <button v-if="showButtonOfTurnAll" class="remove-group" @click="confirmDelete()">X</button>
+                <button v-if="showButtonOfTurnAll"  @click="confirmDelete()"  class="remove-group close-button">X</button>
                 <h3 class="header-group">{{ groupName }}</h3>
                 
-                <ButtonMy v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll"><input :id="'activeAllItems' + id" :checked="devicesAllTurn" disabled class="moje2" :class="{moje : devicesAllTurn}"
+                <ButtonMy :disabled="checkRangeOfDevice()" @click.stop="turnOnAll($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll"><input :id="'activeAllItems' + id" :checked="devicesAllTurn" disabled class="moje2" :class="{moje : devicesAllTurn}"
                         type="checkbox" /><label :for="'activeAllItems' + id" class="arrowPravi"
-                        @click.stop="turnOnAll($event)"></label></ButtonMy>
+                        ></label></ButtonMy>
 
             </div>
             <div class="line-block">
@@ -101,6 +101,9 @@ watch(()=>props.devices,(newValue)=>{
     devicesProba.value = newValue;
 })
 
+const checkRangeOfDevice = ()=>{
+  return props.devices.some(x=>x.is_out_of_range);
+}
 const closeModal = () => {
     close();
     activeForms.value = "";
@@ -113,6 +116,7 @@ const devicesAllTurn = computed(()=>{
 });
 const setNewForms = (selectedForms) => activeForms.value = selectedForms;
 function turnOnAll() {
+  console.log("Usli");
     activeForms.value = null;
     shouldTurnOn.value = devicesProba.value.filter(device => device.status).length!==devicesProba.value.length;
     show(`Da li da zelite sve uredjaje da ${shouldTurnOn.value ? 'upalite' : 'ugasite'}?`, turnAllDevice);
@@ -152,6 +156,7 @@ const removeGroup = async () => {
 }
 const confirmDelete = ()=>{
     activeForms.value = null;
+    console.log("Usli")
     show(`Da li ste sigurni da želite da obrišete grupu "${props.groupName}"?`, removeGroup);
 }
 
@@ -175,8 +180,8 @@ const confirmDelete = ()=>{
 
 .remove-group {
     position: absolute;
-    top: 10px;
-    left: 20px;
+    top: 7px;
+    left: 7px;
     cursor: pointer;
 }
 
@@ -325,6 +330,7 @@ input.moje:checked~.arrowPravi {
 }
 
 .group-items {
+    margin:0px auto;
     margin-top: 50px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;

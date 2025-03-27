@@ -49,12 +49,9 @@ const schema = yup.object().shape({
       .test(
           "at-least-one-checked",
           "Morate odabrati bar jedan uređaj",
-          (devices) => {
-            // Ako nema uređaja (checkboxova), validacija prolazi
-            if (!devices || devices.length === 0) return true;
-
-            // Ako ima uređaja, proveri da li je bar jedan čekiran (true)
-            return devices.some(device => device === true);
+          (devicesLocal) => {
+            if (deviceOptions.value.length === 0 && devicesLocal && devicesLocal.length === 0) return true;
+            return devicesLocal && Array.isArray(devicesLocal) && devicesLocal.length > 0;
           }
       )
 });
@@ -126,11 +123,10 @@ onMounted(async () => {
 });
 
 async function submit(values) {
+  console.log(values);
     if (props.stepForm) {
-        console.log({ id: props.idGrupe, ...values });
         try {
             const response = await store.dispatch('group/AddDevicesInGroup', { id: props.idGrupe, ...values });
-            // console.log(response);
              toast.success(response.message, {
                 timeout: 3000
             });

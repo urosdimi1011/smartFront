@@ -1,5 +1,7 @@
 <template>
-    <div @click.stop="!data.is_out_of_range ? toggleActive() : null" :data-id="data.id" class="lamp background-block" :class="{ active: active,offline : data.is_out_of_range }">
+<!--  ,offline : data.is_out_of_range-->
+<!--  !data.is_out_of_range ? toggleActive() : null-->
+    <div @click.stop="!data.is_out_of_range ? toggleActive() : null" :data-id="data.id" class="lamp background-block" :class="{active: active,offline : data.is_out_of_range }">
        <div class="content-up">
          <div>
                 <template v-if="data.category.name == 'Plug' && data.status == 0">
@@ -14,10 +16,10 @@
                 <div v-if="showInputField" class="name-block">
                     <p>{{ data.name }}</p>
                 </div>
-                <div @click.stop v-if="!showInputField && !data.is_out_of_range" class="form-change-input">
+                <div @click.stop v-if="!showInputField" class="form-change-input">
                     <!-- <span @click.stop="changeNameOfInput()"><i class="fa-solid fa-xmark"></i></span> -->
                     <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
-                    <ButtonMy @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
+                    <ButtonMy class="color-button" @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
                 </div>
               <div v-if="data.is_out_of_range" class="outOfRange">
                 <p>Uredjaj je van mreže</p>
@@ -46,6 +48,9 @@
         <Teleport to="body">
             <modal-layout :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
             </modal-layout>
+          <modal-layout  title="Promeni lozinku" :modalContent="modalContent"  :confirm="confirm" :visible="isOpen" :close="close()">
+
+          </modal-layout>
         </Teleport>
 
 
@@ -137,6 +142,9 @@ async function changeName() {
 
 </script>
 <style>
+.color-button{
+  background-color: #87c33e !important;
+}
 .form-change-input button {
     width: 40%;
     padding: 3px 0px;
@@ -258,7 +266,9 @@ async function changeName() {
     justify-content: center;
     position: relative;
 }
-
+.active{
+  border:1px solid white;
+}
 /* .line{
     position:absolute;
     top: 96%;

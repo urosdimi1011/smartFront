@@ -6,7 +6,7 @@
           <slot name="header">
             <h2>{{ title }}</h2>
           </slot>
-          <button @click="close" class="modal-close">X</button>
+          <button @click="close" class="close-button close-set-d">X</button>
 
         </header>
 
@@ -187,6 +187,10 @@ const changeValuesOnForm = (val) => {
 
 </script>
 <style>
+.modal-overlay .close-set-d{
+  width: 3em !important;
+  height: 3em !important;
+}
 .modal-overlay {
   position: fixed;
   top: 0;

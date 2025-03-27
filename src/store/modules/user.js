@@ -55,6 +55,14 @@ export default {
                 throw Error(error.response.data.message);
             }
         },
+        async changeUserPassword(_commit,idUser) {
+            try {
+                await api.patch(`/api/changePassword/${idUser}`);
+            }
+            catch (error) {
+                throw Error(error.response.data.message);
+            }
+        },
         async logout({ commit }) {
             try {
                 await api.post("/api/logout");

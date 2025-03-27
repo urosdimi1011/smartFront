@@ -1,6 +1,6 @@
 <template>
   <!-- {{ allCategories }} -->
-  <div v-if="isOnline" class="login-background">
+  <div v-touch:swipe.left="nextPage" v-touch:swipe.right="prevPage" v-if="isOnline" class="login-background">
     <div class="tabs background-block">
       <router-link to="/" exact v-slot="{ isActive }">
         <input id="home" type="radio" name="tabsMenu" :class="{ active: isActive }" />
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div v-touch:swipe.left="nextPage" v-touch:swipe.right="prevPage" class="main-moj container">
+    <div class="main-moj container">
       <transition name="slide" mode="out-in">
           <router-view :key="$route.fullPath" v-slot="{ Component }">
               <component :is="Component"  v-if="Component" />
@@ -201,6 +201,44 @@ const prevPage = () => {
 a {
   text-decoration: none;
 }
+
+input:focus {
+  touch-action: manipulation;
+}
+
+.close-button{
+  overflow: hidden;
+  position:relative;
+  border: none;
+  padding: 0;
+  width: 1em !important;
+  height: 1em;
+  border-radius: 50%;
+  background: transparent;
+  color: #1da1f2;
+  font: inherit;
+  text-indent: 100%;
+  cursor: pointer;
+}
+.close-button:focus{
+    outline: solid 0 transparent;
+    box-shadow: 0 0 0 2px #8ed0f9
+}
+.close-button:hover{
+    background: rgba(29, 161, 142, .1)
+}
+
+.close-button:before, .close-button:after {
+  position: absolute;
+  top: 15%; left: calc(50% - .0625em);
+  width: .125em; height: 70%;
+  border-radius: .125em;
+  transform: rotate(45deg);
+  background: currentcolor;
+  content: ''
+}
+.close-button:after { transform: rotate(-45deg); }
+
 
 .skeleton-box {
   width: 25%;

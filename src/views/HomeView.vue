@@ -1,6 +1,6 @@
   <template>
     <div class="group-content">
-      <div v-if="groups && groups.length > 0" id="LightPage" class="group-content">
+      <div v-if="groups && groups.length > 0" id="LightPage">
       <group-items v-for="item in groups" :key="item.id" :groupName="item.name" :id="item.id" :idDevice="item.id"
         :devices="item.devices"></group-items>
     </div>
