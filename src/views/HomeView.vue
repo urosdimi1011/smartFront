@@ -2,7 +2,9 @@
     <div class="group-content">
       <div v-if="groups && groups.length > 0" id="LightPage">
         <draggable v-model="localItems" group="components" item-key="id" @end="onEnd"
-                   @update:modelValue="onModelUpdate">
+                   @update:modelValue="onModelUpdate"
+                   :animation="200"
+                   :ghostClass="'dragging-item'">
           <template #item="{ element }">
             <group-items
                 v-if="element && element.name"
@@ -180,9 +182,22 @@ onMounted(() => {
   background-color: #f9f9f9;
   border-radius: 4px;
 }
-
+#LightPage{
+  touch-action: manipulation;
+  -webkit-user-select: none; /* Blokira selekciju na iOS-u */
+  -webkit-touch-callout: none; /* Sprečava dug pritisak da otvori meni */
+}
+group-items {
+  position: relative;
+}
 .draggable-item:active {
   cursor: grabbing;
+}
+.dragging-item {
+  opacity: 0.5; /* Napravi ga providnijim */
+  background-color: #ddd; /* Doda svetliju boju */
+  border: 2px dashed #888; /* Stavi isprekidanu ivicu */
+  transform: scale(1.05); /* Blago ga povećaj */
 }
 .add-group p {
   font-size: 20px;
