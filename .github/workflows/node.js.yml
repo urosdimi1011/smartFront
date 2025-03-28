@@ -44,4 +44,4 @@ jobs:
           ftp-username: ${{ secrets.FTP_USERNAME }}
           ftp-password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          git-ftp-args: --remote-root /public_html/smartera.razmenidom.com --auto-init
+          server-dir: /public_html/smartera.razmenidom.com/
