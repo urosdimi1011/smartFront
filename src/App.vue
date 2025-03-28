@@ -233,7 +233,12 @@ input:focus {
 .close-button:hover{
     background: rgba(29, 161, 142, .1)
 }
-
+.tabs{
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 2;
+}
 .close-button:before, .close-button:after {
   position: absolute;
   top: 15%; left: calc(50% - .0625em);
@@ -358,6 +363,7 @@ input:focus {
 .login-background {
   min-height: 220vh;
   background-color: #011134;
+  padding-top: 137px;
 }
 
 .background {
