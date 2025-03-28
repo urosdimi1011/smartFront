@@ -305,6 +305,7 @@ input.moje:checked~.arrowPravi {
     border-color: white;
     /* margin-left: 10px; */
     padding: 10px;
+
 }
 
 .arrow {

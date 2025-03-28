@@ -107,7 +107,10 @@ import store from '@/store';
 import UserView from './views/UserView.vue';
 
 
-const components = shallowRef([{ component: TimerView, props: { title : "Dodajte tajmer" } }, { component: TimerTable, props: { width: "1300px",title : "Pregled tajmera" } }]);
+const components = shallowRef([
+    { component: TimerView, props: { title : "Dodajte tajmer" } },
+    { component: TimerTable, props: { width: "1300px",title : "Pregled tajmera" } }
+]);
 
 const stepIndex = ref(0);
 const route = useRoute();
@@ -140,7 +143,7 @@ function isActive(path) {
   return currentPath.startsWith(targetPath);
 }
 function showTimerModal() {
-  components.value = [{ component: TimerView }, { component: TimerTable, props: { width: "1300px" } }];
+  components.value = [{ component: TimerView, props: {title : "Dodaj tajmer"} }, { component: TimerTable, props: { width: "1300px",title:'Lista tajmera' } }];
   show();
 }
 
@@ -881,6 +884,24 @@ button:active {
     background-repeat: no-repeat;
     left: -40px;
     top: -80px;
+  }
+  .header-group{
+    font-size: 15px;
+    width: 60%;
+  }
+  .activeAll{
+    width: 15% !important;
+  }
+  .arrowPravi{
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .login-background{
+    height: 300vh;
+  }
+  .container{
+    height: 250vh;
+    max-height: 400vh;
   }
 }
 

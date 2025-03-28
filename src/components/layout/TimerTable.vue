@@ -57,7 +57,8 @@
             </Column>
             <Column class="width-column-input" field="time" header="Vreme">
                 <template #editor="{ data, field }">
-                    <DatePicker name="time" class="width-column-input p-datepicker-time-picker-moj" v-model="data[field]" timeOnly />
+                  {{data[field]}}
+                    <DatePicker name="time" class="width-column-input p-datepicker-time-picker-moj" v-model="data[field]" timeOnly :utcOffset="0"/>
                 </template>
             </Column>
             <Column field="active" header="Aktivan">
@@ -192,6 +193,7 @@ const editingRows = ref([]);
 
 const onRowEditSave = async (event) => {
     let { newData } = event;
+    console.log(newData.time);
     const dataForSend = {
         "name": newData.name,
         "time": newData.time,

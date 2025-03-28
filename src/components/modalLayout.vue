@@ -2,7 +2,6 @@
   <div v-if="visible" class="modal-overlay" @click="closeOnOverlay">
     <transition name="fade">
       <div class="modal-content" :style="{width : (currentStepProps ? (currentStepProps.width || width) : width)}" @click.stop>
-        {{currentStepProps}}
         <header class="modal-header">
           <slot name="header">
             <h2>{{ currentStepProps.title || title }}</h2>

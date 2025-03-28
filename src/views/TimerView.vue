@@ -1,7 +1,6 @@
 <template>
     <div class="page">
         <div class="add-timer-content">
-            <h3>Dodaj tajmer</h3>
             <Form @submit="submit" :validation-schema="schema">
                 <div class="groups-items">
                     <p> Nazovi tajmer</p>

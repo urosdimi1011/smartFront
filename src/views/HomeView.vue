@@ -1,6 +1,6 @@
   <template>
     <div class="group-content">
-      <div v-if="groups && groups.length > 0" id="LightPage">
+      <div v-if="localItems && groups && groups.length > 0" id="LightPage">
         <draggable v-model="localItems" group="components" item-key="id" @end="onEnd"
                    @update:modelValue="onModelUpdate"
                    :animation="200"
@@ -16,9 +16,8 @@
             />
           </template>
         </draggable>
-
     </div>
-    <div v-if="groups === null" class="spinner-container">
+    <div v-if="loadingSpiner" class="spinner-container">
       <ProgressSpinner/>
     </div>
 
@@ -48,7 +47,7 @@
     </div>
   </template>
 <script setup>
-import {ref, onMounted, onUpdated, shallowRef, computed, defineOptions, watch} from 'vue';
+import {ref, onMounted, shallowRef, computed, defineOptions, watch,toRaw} from 'vue';
 import GroupForm from '../features/groups/GroupForm.vue';
 import DeviceFormCheckBox from '../features/devices/DeviceFormCheckBox.vue';
 import modalLayout from '../components/modalLayout.vue';
@@ -59,6 +58,19 @@ import DeviceForm from '@/features/devices/DeviceForm.vue';
 import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
 import ProgressSpinner from 'primevue/progressspinner';
+import {setItem} from "@/config/indexedDB";
+
+onMounted(async () => {
+  loadingSpiner.value = true;
+
+  await fetchItems();
+  const storedItems = await store.getters['group/getAllGroupsInIndexedDB'];
+  groups.value = storedItems ? storedItems : store.getters['group/getAllGroups'];
+
+  // Postavljanje vrednosti za `localItems` kada se podaci učitaju
+  localItems.value = storedItems ? storedItems : groups.value;
+  loadingSpiner.value = false;
+});
 
 const onModelUpdate = (newValue) => {
   groups.value = [...newValue];
@@ -66,34 +78,29 @@ const onModelUpdate = (newValue) => {
 defineOptions({
   inheritAttrs: false
 });
+
 // Ovo je potrebno za drag and drop deo funkcionalnosti!
-const onEnd = () => {
+
+const onEnd = async () => {
+  //Ovaj podatak upisujemo u indexedDB!!
+  const rawItems = toRaw(localItems.value.map(item => toRaw(item)));
+  await setItem('localItems',rawItems);
   store.commit('group/updateGroupsOrder', localItems.value);
 };
-
 const { isOpen, show, close } = showModal();
 const store = useStore();
-const groups = computed(()=>{
-  return store.getters['group/getAllGroups'] || [];
-})
+const groups = ref([]);
 const toast = useToast();
 const steps = shallowRef([{ component: GroupForm, props: { previousValue: {} } }
-  , { component: DeviceFormCheckBox, props: { previousValue: {} } }]);
+  ,{ component: DeviceFormCheckBox, props: { previousValue: {} } }]);
 const newDevica = shallowRef([{ component: DeviceForm, props: { previousValue: {} } }]);
 
-
-const localItems = ref([...groups.value]);
-
+const localItems = shallowRef([]);
 const condicional = ref(false);
-// var items = ref([]);
+const loadingSpiner = ref(false);
 
 const devicesAll = computed(()=>{
-  // console.log(store.getters['device/getAllDevices']);
   return store.getters['device/getAllDevices'];
-})
-
-onUpdated(() => {
-  console.log(steps.value);
 })
 
 const showModalDevice = (which) => {
@@ -119,15 +126,15 @@ async function fetchItems() {
         timeout: 3000
       });
   }
-  // items.value = response.groups;
 }
 
 const setToStepRecivedData = (data) => {
   steps.value[data.step - 1].props.previousValue = data;
 }
-watch(groups,(newValue)=>{
+watch(() => store.getters['group/getAllGroups'],(newValue)=>{
   localItems.value = newValue;
 })
+
 const sendAllData = async () => {
   const data = {
     name: steps.value[0]?.props?.previousValue?.grupaUredjaja,
@@ -144,26 +151,11 @@ const sendAllData = async () => {
     toast.error(error.message, {
         timeout: 3000
       });
-
   }
-  // if(response.status === 201){
-    // }
-    // else{
-      //   toast.error(response.data.message, {
-        //     timeout: 3000
-        //   });
-        // }
 }
-
 const closeAll = () => {
-  // steps.value.forEach((x)=>x.props.previousValue = {});
   close();
 }
-
-
-onMounted(() => {
-  fetchItems();
-});
 
 
 </script>

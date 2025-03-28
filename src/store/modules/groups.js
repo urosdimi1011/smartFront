@@ -1,4 +1,5 @@
 import api from "@/config/axios";
+import {getItem, setItem} from "@/config/indexedDB";
 
 export default {
     namespaced: true,
@@ -9,6 +10,9 @@ export default {
     getters: {
         getAllGroups(state) {
             return state.groups;
+        },
+        async getAllGroupsInIndexedDB(){
+            return await getItem('localItems');
         },
         getAllFilterGroup: (state) => (id) => {
             if (!state.groups || state.groups.length === 0) {
@@ -35,6 +39,7 @@ export default {
     mutations: {
         setGroups(state, payload) {
             state.groups = payload;
+
         },
         setFilterGroups(state, payload) {
             state.filterGroups = payload;
@@ -65,6 +70,7 @@ export default {
                 if (id == null) {
                     response = await api.get('/api/groups');
                     commit('setGroups', response.data.groups);
+                    await setItem('localItems',response.data.groups);
                 }
                 else {
                     response = await api.get("/api/groups?idCategory=" + parseInt(id));
