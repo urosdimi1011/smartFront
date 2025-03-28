@@ -1,47 +1,33 @@
-name: Node.js CI
+name: Deploy Vue App
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches:
+      - master  # Pokreće se kada pushuješ na main branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x] # Koristi stabilnu verziju
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-    - name: Check Node.js and NPM version
-      run: |
-        node -v
-        npm -v
+      - name: Install dependencies
+        run: npm install
 
-    - name: Install correct Chart.js version
-      run: npm install chart.js@3.9.1
+      - name: Build project
+        run: npm run build
 
-    - name: Install dependencies
-      run: npm install --legacy-peer-deps
-
-    - name: Build project
-      run: npm run build --if-present
-      
-    - name: Deploy to FTP
-      uses: SamKirkland/FTP-Deploy-Action@v3.1.0
-      with:
-          ftp-server: ${{ secrets.FTP_HOST }}
-          ftp-username: ${{ secrets.FTP_USERNAME }}
-          ftp-password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
+      - name: Deploy to FTP server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: dist/  # Ovde ide output Vue aplikacije
           server-dir: /public_html/smartera.razmenidom.com/
