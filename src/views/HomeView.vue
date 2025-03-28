@@ -65,6 +65,7 @@ onMounted(async () => {
 
   await fetchItems();
   const storedItems = await store.getters['group/getAllGroupsInIndexedDB'];
+  console.log(storedItems);
   groups.value = storedItems ? storedItems : store.getters['group/getAllGroups'];
 
   // Postavljanje vrednosti za `localItems` kada se podaci učitaju
@@ -95,7 +96,7 @@ const steps = shallowRef([{ component: GroupForm, props: { previousValue: {} } }
   ,{ component: DeviceFormCheckBox, props: { previousValue: {} } }]);
 const newDevica = shallowRef([{ component: DeviceForm, props: { previousValue: {} } }]);
 
-const localItems = shallowRef([]);
+const localItems = ref([]);
 const condicional = ref(false);
 const loadingSpiner = ref(false);
 

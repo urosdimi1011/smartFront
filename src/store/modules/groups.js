@@ -70,7 +70,12 @@ export default {
                 if (id == null) {
                     response = await api.get('/api/groups');
                     commit('setGroups', response.data.groups);
-                    await setItem('localItems',response.data.groups);
+                    const items = await getItem('localItems');
+
+                    if(items.length !== response.data.groups.length){
+                        await setItem('localItems',response.data.groups);
+                    }
+
                 }
                 else {
                     response = await api.get("/api/groups?idCategory=" + parseInt(id));
