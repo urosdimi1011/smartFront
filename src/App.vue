@@ -107,7 +107,7 @@ import store from '@/store';
 import UserView from './views/UserView.vue';
 
 
-const components = shallowRef([{ component: TimerView, props: { title : "Dodajte tajmer" } }, { component: TimerTable, props: { width: "1300px" } }]);
+const components = shallowRef([{ component: TimerView, props: { title : "Dodajte tajmer" } }, { component: TimerTable, props: { width: "1300px",title : "Pregled tajmera" } }]);
 
 const stepIndex = ref(0);
 const route = useRoute();

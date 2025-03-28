@@ -4,7 +4,8 @@
         <draggable v-model="localItems" group="components" item-key="id" @end="onEnd"
                    @update:modelValue="onModelUpdate"
                    :animation="200"
-                   :ghostClass="'dragging-item'">
+                   :ghostClass="'dragging-item'"
+                   :delay="100">
           <template #item="{ element }">
             <group-items
                 v-if="element && element.name"
