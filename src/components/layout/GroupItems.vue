@@ -33,23 +33,23 @@
                     </div>
                 </div>
             </transition>
-        </div>
-        <Teleport to="body">
+          <Teleport to="body">
             <modal-layout :modal-content="modalContent" :confirm="confirm" :visible="isOpen" @close="closeModal()">
-                <template #header>
-                    <!-- <div class="modal-header">
-                        <h2>Unesite uredjaj</h2>
-                    </div> -->
-                </template>
-                <template #body>
-                    <!-- Vidi da li moze da se ovo bolje odradi! -->
-                    <SelectingFormView :textOnButtons="textOnButton" :showModals="showModals" v-if="activeForms === ''" @changeForms="setNewForms" />
-                    <DeviceForm :idGrupe="id" v-if="activeForms === 'newDevice'" />
-                    <DeviceFormCheckBox :idGrupe="id" stepForm="true" v-if="activeForms === 'addDevice'"
-                        @changeForms="setNewForms" @close="closeModal()" />
-                </template>
+              <template #header>
+                <!-- <div class="modal-header">
+                    <h2>Unesite uredjaj</h2>
+                </div> -->
+              </template>
+              <template #body>
+                <!-- Vidi da li moze da se ovo bolje odradi! -->
+                <SelectingFormView :textOnButtons="textOnButton" :showModals="showModals" v-if="activeForms === ''" @changeForms="setNewForms" />
+                <DeviceForm :idGrupe="id" v-if="activeForms === 'newDevice'" />
+                <DeviceFormCheckBox :idGrupe="id" stepForm="true" v-if="activeForms === 'addDevice'"
+                                    @changeForms="setNewForms" @close="closeModal()" />
+              </template>
             </modal-layout>
-        </Teleport>
+          </Teleport>
+        </div>
 
 
     </template>

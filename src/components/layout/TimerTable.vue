@@ -2,9 +2,9 @@
     <template v-if="timers && timers.length > 0">
         <DataTable v-model:editingRows="editingRows" size="large" editMode="row" dataKey="id"
             @row-edit-save="onRowEditSave" :value="timers" scrollHeight="400px">
-            <Column field="name" header="Ime">
+            <Column class="width-column-input" field="name" header="Ime">
                 <template #editor="{ data, field }">
-                    <InputText v-model="data[field]" fluid />
+                    <InputText class="width-column-input" v-model="data[field]" fluid />
                 </template>
             </Column>
             <Column field="status" header="Akcija">
@@ -55,9 +55,9 @@
                         }" id="days" :options="days" multiSelect label="Izaberite dane" name="idsDays" />
                 </template>
             </Column>
-            <Column field="time" header="Vreme">
+            <Column class="width-column-input" field="time" header="Vreme">
                 <template #editor="{ data, field }">
-                    <DatePicker name="time" class="p-datepicker-time-picker-moj" v-model="data[field]" timeOnly />
+                    <DatePicker name="time" class="width-column-input p-datepicker-time-picker-moj" v-model="data[field]" timeOnly />
                 </template>
             </Column>
             <Column field="active" header="Aktivan">
@@ -221,7 +221,9 @@ button {
     background-color: transparent;
     border: none;
 }
-
+.width-column-input{
+  width: 200px !important;
+}
 table button {
     cursor: pointer;
 }

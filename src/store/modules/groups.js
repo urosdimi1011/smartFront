@@ -38,6 +38,9 @@ export default {
         },
         setFilterGroups(state, payload) {
             state.filterGroups = payload;
+        },
+        updateGroupsOrder(state,newOrder){
+            state.groups = newOrder;
         }
     },
     actions: {

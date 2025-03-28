@@ -1,8 +1,19 @@
   <template>
     <div class="group-content">
       <div v-if="groups && groups.length > 0" id="LightPage">
-      <group-items v-for="item in groups" :key="item.id" :groupName="item.name" :id="item.id" :idDevice="item.id"
-        :devices="item.devices"></group-items>
+        <draggable v-model="localItems" group="components" item-key="id" @end="onEnd"
+                   @update:modelValue="onModelUpdate">
+          <template #item="{ element }">
+            <group-items
+                v-if="element && element.name"
+                :groupName="element.name"
+                :id="element.id"
+                :idDevice="element.id"
+                :devices="element.devices"
+            />
+          </template>
+        </draggable>
+
     </div>
     <div v-if="groups === null" class="spinner-container">
       <ProgressSpinner/>
@@ -34,28 +45,45 @@
     </div>
   </template>
 <script setup>
-import { ref, onMounted, onUpdated, shallowRef,computed } from 'vue';
+import {ref, onMounted, onUpdated, shallowRef, computed, defineOptions, watch} from 'vue';
 import GroupForm from '../features/groups/GroupForm.vue';
 import DeviceFormCheckBox from '../features/devices/DeviceFormCheckBox.vue';
 import modalLayout from '../components/modalLayout.vue';
-import { showModal } from '../composables/modal'; // Uvođenje composable-a
+import Draggable from 'vuedraggable';
+import { showModal } from '@/composables/modal';
 import groupItems from '../components/layout/GroupItems.vue';
 import DeviceForm from '@/features/devices/DeviceForm.vue';
 import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
 import ProgressSpinner from 'primevue/progressspinner';
 
+const onModelUpdate = (newValue) => {
+  groups.value = [...newValue];
+}
+defineOptions({
+  inheritAttrs: false
+});
+// Ovo je potrebno za drag and drop deo funkcionalnosti!
+const onEnd = () => {
+  store.commit('group/updateGroupsOrder', localItems.value);
+};
+
 const { isOpen, show, close } = showModal();
 const store = useStore();
+const groups = computed(()=>{
+  return store.getters['group/getAllGroups'] || [];
+})
 const toast = useToast();
 const steps = shallowRef([{ component: GroupForm, props: { previousValue: {} } }
   , { component: DeviceFormCheckBox, props: { previousValue: {} } }]);
 const newDevica = shallowRef([{ component: DeviceForm, props: { previousValue: {} } }]);
+
+
+const localItems = ref([...groups.value]);
+
 const condicional = ref(false);
 // var items = ref([]);
-const groups = computed(()=>{
-  return store.getters['group/getAllGroups'];
-})
+
 const devicesAll = computed(()=>{
   // console.log(store.getters['device/getAllDevices']);
   return store.getters['device/getAllDevices'];
@@ -94,7 +122,9 @@ async function fetchItems() {
 const setToStepRecivedData = (data) => {
   steps.value[data.step - 1].props.previousValue = data;
 }
-
+watch(groups,(newValue)=>{
+  localItems.value = newValue;
+})
 const sendAllData = async () => {
   const data = {
     name: steps.value[0]?.props?.previousValue?.grupaUredjaja,
@@ -142,7 +172,18 @@ onMounted(() => {
   margin: 80px 0px;
   color: #fff;
 }
+.draggable-item {
+  cursor: grab;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 5px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
 
+.draggable-item:active {
+  cursor: grabbing;
+}
 .add-group p {
   font-size: 20px;
 }
