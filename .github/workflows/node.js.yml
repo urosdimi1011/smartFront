@@ -30,4 +30,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: dist/  # Ovde ide output Vue aplikacije
-          server-dir: /public_html/smartera.razmenidom.com/
+          server-dir: /
