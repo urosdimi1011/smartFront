@@ -32,7 +32,7 @@
     </div>
 </template>
 <script setup>
-import { defineProps, defineEmits, onUpdated, computed, onMounted } from 'vue';
+import { defineProps, defineEmits, onUpdated, computed } from 'vue';
 import { Field, ErrorMessage } from 'vee-validate';
 import { Checkbox, MultiSelect, RadioButton } from 'primevue';
 const props = defineProps({
@@ -78,9 +78,6 @@ onUpdated(() => {
     }
 })
 
-onMounted(() => {
-    console.log(proba);
-})
 const proba = computed({
     get: () => props.modelValue,
     set: (newValue) => {
@@ -94,6 +91,8 @@ const selected = computed({
     get: () => props.modelValue, 
     set: (newValue) => emit('update:modelValue', newValue) 
 });
+
+
 const emit = defineEmits(['update:modelValue']);
 </script>
 <style>
@@ -127,5 +126,11 @@ input {
 .form-group:has(>.w) {
     flex-direction: column;
     align-items: flex-start !important;
+}
+.form-input input{
+  background-color: transparent;
+  color: white;
+  border:none;
+  border-bottom: 2px solid white;
 }
 </style>

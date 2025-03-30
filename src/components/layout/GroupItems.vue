@@ -3,7 +3,12 @@
             :class="{ scale: isClass || automaticOpen, glowEffect: devicesAllTurn }">
             <div class="header-group-content">
                 <button v-if="showButtonOfTurnAll"  @click="confirmDelete()"  class="remove-group close-button">X</button>
-                <h3 class="header-group">{{ groupName }}</h3>
+                <h3 v-if="!doesChangeGroupName" class="header-group">{{ groupName }} <span v-if="doesChangeGroupNameProps" @click="changeGroupNameFunc()"><i class="fa-solid fa-pencil"></i></span></h3>
+                <div v-else class="changeGroupNameBlock">
+                  <i @click="changeGroupNameFunc()" class="fa fa-window-close"></i>
+                  <FormInput class="form-input" id="groupName" name="groupName" v-model="newGroupName"/>
+                  <button-my @click="changeGroupName()">Izmeni</button-my>
+                </div>
                 
                 <ButtonMy :disabled="checkRangeOfDevice()" @click.stop="turnOnAll($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll"><input :id="'activeAllItems' + id" :checked="devicesAllTurn" disabled class="moje2" :class="{moje : devicesAllTurn}"
                         type="checkbox" /><label :for="'activeAllItems' + id" class="arrowPravi"
@@ -63,6 +68,8 @@ import DeviceForm from '@/features/devices/DeviceForm.vue';
 import DeviceFormCheckBox from '@/features/devices/DeviceFormCheckBox.vue';
 import store from '@/store';
 import { useToast } from 'vue-toastification';
+import ButtonMy from "@/components/ui/ButtonMy.vue";
+import FormInput from "@/components/ui/FormInput.vue";
 // import device from '@/store/modules/device';
 
 const showMenuProp = ref(false);
@@ -70,6 +77,7 @@ const isClass = ref(false);
 const turnAllClassActive = ref(false);
 let activeForms = ref('');
 const shouldTurnOn = ref(false);
+const doesChangeGroupName = ref(false);
 const textOnButton = ref(['Dodaj novi uredjaj','Dodaj vec postojeci uredjaj']);
 const showModals = ref(['newDevice','addDevice']);
 const toast = useToast();
@@ -92,6 +100,10 @@ const props = defineProps({
       required : false,
       default: true
     },
+  doesChangeGroupNameProps:{
+    required:false,
+    default:true
+  },
     groupName: String,
     id: Number,
     idDevice: Number,
@@ -116,7 +128,6 @@ const devicesAllTurn = computed(()=>{
 });
 const setNewForms = (selectedForms) => activeForms.value = selectedForms;
 function turnOnAll() {
-  console.log("Usli");
     activeForms.value = null;
     shouldTurnOn.value = devicesProba.value.filter(device => device.status).length!==devicesProba.value.length;
     show(`Da li da zelite sve uredjaje da ${shouldTurnOn.value ? 'upalite' : 'ugasite'}?`, turnAllDevice);
@@ -160,10 +171,52 @@ const confirmDelete = ()=>{
     show(`Da li ste sigurni da želite da obrišete grupu "${props.groupName}"?`, removeGroup);
 }
 
+const changeGroupName = async ()=>{
+  console.log(newGroupName.value);
+  const data = {
+    name : newGroupName.value,
+    id: props.id
+  };
+  try{
+    await store.dispatch('group/changeGroupName',data);
+    toast.success('Uspesno ste izmenili naziv grupe',{
+      timeout: 3000
+    });
+    doesChangeGroupName.value = !doesChangeGroupName.value;
+  }
+  catch (error){
+    toast.error(error.message,{
+      timeout: 3000
+    });
+  }
+}
 
+const changeGroupNameFunc = ()=>{
+  newGroupName.value = props.groupName;
+  doesChangeGroupName.value = !doesChangeGroupName.value;
+}
 
+const newGroupName = ref(props.groupName);
 </script>
 <style scoped>
+.changeGroupNameBlock{
+  display:flex;
+  gap:20px;
+  align-items: center;
+}
+.changeGroupNameBlock button{
+  font-size: 15px;
+  font-weight: 200;
+}
+.changeGroupNameBlock i{
+  cursor:pointer;
+}
+.form-input input{
+  background-color: transparent !important;
+  border:none !important;
+  border-bottom: 2px solid black !important;
+}
+
 .w-100 {
     width: 100%;
 }
@@ -232,9 +285,15 @@ const confirmDelete = ()=>{
 }
 
 .header-group {
-    width: 20%;
+    width: 30%;
+    display: flex;
+    align-items:center;
+    gap:25px;
 }
-
+.header-group i{
+  font-size:25px;
+  cursor:pointer;
+}
 .moje2 {
     display: none;
 }

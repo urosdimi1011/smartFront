@@ -5,10 +5,8 @@
             <FormInput type="password" id="wifiPassword" name="wifiPassword"
                 label="Unesite šifru Vašeg WiFi interneta :" />
             <FormInput id="name" name="name" label="Unesite naziv uredjaja: " />
-            <!-- <FormInput type="password" id="devicePassword" name="devicePassword" label="Unesite sifru uredjaja: " /> -->
             <FormInput v-model="checkedCategory" label="Izaberite kategoriju uredjaja" type="radio"
                 :options="allCategories" id="id_category" name="id_category" />
-
             <div v-if="idGrupe">
                 <FormInput id="idGrupe" name="idGrupe" type="hidden" v-model="id_group" />
             </div>

@@ -71,8 +71,7 @@ export default {
                     response = await api.get('/api/groups');
                     commit('setGroups', response.data.groups);
                     const items = await getItem('localItems');
-
-                    if(items.length !== response.data.groups.length){
+                    if(items && (items.length !== response.data.groups.length)){
                         await setItem('localItems',response.data.groups);
                     }
 
@@ -86,6 +85,7 @@ export default {
                 }
             }
             catch (error) {
+                console.log(error);
                 throw Error(error.message);
             }
         },
@@ -107,6 +107,17 @@ export default {
                 const response = await api.delete(`/api/groups/${id}`);
                 dispatch('getAllGroup');
                 return response.data;
+            }
+            catch (error) {
+                throw Error(error.message);
+            }
+        },
+        async changeGroupName({dispatch},payload){
+            try {
+                console.log(payload);
+                const response = await api.patch(`/api/group/${payload.id}`, {"name": payload.name});
+                dispatch('getAllGroup');
+                return response
             }
             catch (error) {
                 throw Error(error.message);
