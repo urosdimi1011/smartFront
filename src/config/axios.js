@@ -1,6 +1,5 @@
 import axios from 'axios';
 import store from '@/store'; // Importuj Vuex store
-// https://smarteraback.razmenidom.com'
 const instance = axios.create({
     baseURL: 'https://smarteraback.razmenidom.com',  // Ovde stavite svoju osnovnu URL adresu
     timeout: 10000,  // Timeout za zahteve (10 sekundi)

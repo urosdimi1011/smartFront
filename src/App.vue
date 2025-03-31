@@ -24,6 +24,7 @@
           <label v-for="cat in allCategories" :key="cat.id" :for="cat.name"
             :class="{ 'active-tab': isActive('/' + cat.name === '/Heating/Cooling' ? '/temperature' : '/' + cat.name) }"><i
               :class="cat.icon"></i></label>
+          <div class="underline"></div>
         </template>
         <template v-else>
           <Skeleton size="3rem"></Skeleton>
@@ -362,7 +363,7 @@ input:focus {
 
 .login-background {
   min-height: 220vh;
-  background-color: #011134;
+  background-color: #00293E;
   padding-top: 137px;
 }
 
@@ -781,14 +782,25 @@ button:active {
 
   border-radius: 4px;
 
-  filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff) drop-shadow(0 0 30px #fff) drop-shadow(0 0 50px #fff);
+  filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff);
 
 }
 
+.active-tab:nth-of-type(1) ~ .underline{
+  left:0%;
+}
+.active-tab:nth-of-type(2) ~ .underline{
+  left:26%;
+}
+.active-tab:nth-of-type(3) ~ .underline{
+  left:52%;
+}
+.active-tab:nth-of-type(4) ~ .underline{
+  left:78%;
+}
 .tabs input:nth-child(1):checked~.buttons .underline {
 
-  left: 0;
-
+  left: 51%;
 }
 
 .tabs input:nth-child(2):checked~.buttons .underline {

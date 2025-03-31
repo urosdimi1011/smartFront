@@ -111,17 +111,14 @@ const nextStep = async () => {
 
 const isValidateToNextStep = async () => {
   const isValid = await validateCurrentStep();
-  console.log(isValid);
   if (hasNext() && isValid.valid===false) {
     var messages= Object.values(isValid.errors);
     printErrorMessage(messages.join(','));
     return false;
   }
   if(isValid.errors){
-    console.log("Usli");
     var messages1= Object.values(isValid.errors);
     printErrorMessage(messages1.join(", "));
-
   }
   return isValid.valid;
 }
