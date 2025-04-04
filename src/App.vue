@@ -149,7 +149,7 @@ function showTimerModal() {
 }
 
 const showUserModal = () => {
-  components.value = [{ component: UserView }];
+  components.value = [{ component: UserView,props: {title : 'Korisnički profil'} }];
   show();
 }
 onMounted(() => {
@@ -734,7 +734,7 @@ button:active {
 
   bottom: 0;
 
-  width: 20%;
+  width: 15%;
 
   height: 5px;
 
@@ -752,7 +752,7 @@ button:active {
 
   transform: translateX(-50%);
 
-  width: 40px;
+  width: 40%;
 
   height: 100%;
 
@@ -774,7 +774,7 @@ button:active {
 
   transform: translateX(-50%);
 
-  width: 40px;
+  width: 40%;
 
   height: 100%;
 
@@ -787,16 +787,16 @@ button:active {
 }
 
 .active-tab:nth-of-type(1) ~ .underline{
-  left:0%;
+  left:4%;
 }
 .active-tab:nth-of-type(2) ~ .underline{
-  left:26%;
+  left:29.5%;
 }
 .active-tab:nth-of-type(3) ~ .underline{
-  left:52%;
+  left:55.1%;
 }
 .active-tab:nth-of-type(4) ~ .underline{
-  left:78%;
+  left:80.9%;
 }
 .tabs input:nth-child(1):checked~.buttons .underline {
 
@@ -972,6 +972,41 @@ button:active {
     width: 45%;
     overflow: hidden;
   }
+
+
+
+  .underline {
+    width: 17%;
+  }
+  .underline::before {
+    width: 53%;
+    left: 0;
+  transform : translateX(0%);
+  }
+
+  .underline::after {
+    width: 50%;
+    right:0;
+    transform : translateX(0%);
+  }
+
+  .active-tab:nth-of-type(1) ~ .underline{
+    left:6%;
+  }
+  .active-tab:nth-of-type(2) ~ .underline{
+    left:29.5%;
+  }
+  .active-tab:nth-of-type(3) ~ .underline {
+    left: 53.1%;
+  }
+  .active-tab:nth-of-type(4) ~ .underline{
+    left:76.9%;
+  }
+
+
+
+
+
 }
 
 .block-fixed {

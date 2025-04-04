@@ -91,7 +91,6 @@ export default {
 
             }
             catch (error) {
-                console.error("Greška pri osvežavanju tokena:", error);
                 router.push("/login");
                 commit("removeToken");
                 return false;

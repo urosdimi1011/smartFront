@@ -1,5 +1,4 @@
 <template>
-    <h2 class="mb-5">Korisnicki profil</h2>
     <div class="user-body">
         <ul>
             <li><strong>Username:</strong> {{ getUser.username }}</li>
@@ -34,7 +33,6 @@ const changePassword = ()=>{
 }
 
 const confirmSend = async ()=>{
-  console.log(JSON.parse(localStorage.getItem('user')).id);
   await store.dispatch('user/changeUserPassword',JSON.parse(localStorage.getItem('user')).id);
   toast.success("Uspesno je poslata poruka, proverite email.",{
     timeout:3000

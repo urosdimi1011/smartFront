@@ -167,7 +167,6 @@ const removeGroup = async () => {
 }
 const confirmDelete = ()=>{
     activeForms.value = null;
-    console.log("Usli")
     show(`Da li ste sigurni da želite da obrišete grupu "${props.groupName}"?`, removeGroup);
 }
 

@@ -11,9 +11,6 @@ export default {
         getAllGroups(state) {
             return state.groups;
         },
-        async getAllGroupsInIndexedDB(){
-            return await getItem('localItems');
-        },
         getAllFilterGroup: (state) => (id) => {
             if (!state.groups || state.groups.length === 0) {
                 return []; 
@@ -39,7 +36,6 @@ export default {
     mutations: {
         setGroups(state, payload) {
             state.groups = payload;
-
         },
         setFilterGroups(state, payload) {
             state.filterGroups = payload;
@@ -64,17 +60,13 @@ export default {
             }
             // commit('setUser',user);
         },
-        async getAllGroup({ commit }, id = null) {
+        async getAllGroup({commit,dispatch }, id = null) {
             try {
                 let response = null;
                 if (id == null) {
                     response = await api.get('/api/groups');
                     commit('setGroups', response.data.groups);
-                    const items = await getItem('localItems');
-                    if(items && (items.length !== response.data.groups.length)){
-                        await setItem('localItems',response.data.groups);
-                    }
-
+                    dispatch('filteringOrderInNewGroups',response.data.groups);
                 }
                 else {
                     response = await api.get("/api/groups?idCategory=" + parseInt(id));
@@ -87,6 +79,25 @@ export default {
             catch (error) {
                 console.log(error);
                 throw Error(error.message);
+            }
+        },
+        async setLocalItemFromIndexedDb({commit},payload){
+            await setItem('localItems',payload);
+            commit('setGroups', payload);
+        },
+        async filteringOrderInNewGroups({dispatch},newGroups){
+            const groups = await getItem('localItems');
+            if(groups && groups.length){
+                let updatedGroups = groups
+                    .filter(oldGroup => newGroups.some(newG => {
+                        return newG.id === oldGroup.id
+                    }))
+                    .map(oldGroup => newGroups.find(newG => newG.id === oldGroup.id));
+                let newEntries = newGroups.filter(newG => !groups.some(oldG => oldG.id === newG.id));
+                dispatch('setLocalItemFromIndexedDb',[...updatedGroups, ...newEntries]);
+            }
+            else{
+                dispatch('setLocalItemFromIndexedDb',newGroups);
             }
         },
         async AddDevicesInGroup({ dispatch }, payload) {

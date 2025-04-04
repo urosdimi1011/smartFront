@@ -21,8 +21,9 @@
               <!-- <h2>Potvrda</h2> -->
               <!-- Znaci ovo je default ukoliko se ne prosledi koja komponenta ce se ucitati, onda ce ovaj deo,
                 ali potrebno je da prosledimo ove funkcije confirm i close, a show funkcija poziva u drugom delu open metodu -->
-              <p>{{ modalContent }}</p>
-              <div class="modal-actions">
+              <component v-if="typeof modalContent === 'object'" :is="modalContent" v-bind="props.props"></component>
+              <p v-else>{{ modalContent }}</p>
+              <div v-if="typeof modalContent !== 'object'" class="modal-actions">
                 <ButtonMy @click="confirm">Da</ButtonMy>
                 <ButtonMy @click="close">Ne</ButtonMy>
               </div>
@@ -57,8 +58,13 @@ const props = defineProps({
     default: false
   },
   modalContent: {
-    type: String,
+    type: [String, Object],
     default: '',
+  },
+  props : {
+    type : [Object, Array],
+    required:false,
+    default: () => { }
   },
   confirm: {
     type: Function,
@@ -97,7 +103,6 @@ const currentStepProps = computed(() => currentStep.value?.props || {});
 
 const hasPrevious = () => currentStepIndex.value > 0;
 const hasNext = () => {
-  console.log(currentStepIndex.value) 
   return currentStepIndex.value < props.steps.length - 1
 };
 
@@ -135,12 +140,7 @@ const close = () => {
 const finishAll = async () => {
 
   if (await isValidateToNextStep()) emit('finish');
-  // const isValid = await validateCurrentStep();
-  // if (isValid.valid) {
-  // emit('finish');/
-  // } else {
-  // errorMsg.value = 'Polja moraju da budu popunjena';
-  // }
+
 };
 
 const validateCurrentStep = async () => {

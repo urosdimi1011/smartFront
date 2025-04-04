@@ -37,11 +37,6 @@
       <Teleport to="body">
         <modal-layout :visible="isOpen" @close="closeAll()" :steps="condicional ? newDevica : steps"
           @getDatas="setToStepRecivedData" @finish="sendAllData">
-          <template #header>
-            <div class="modal-header">
-              <h2>Grupa</h2>
-              </div>
-          </template>
         </modal-layout>
       </Teleport>
     </div>
@@ -64,12 +59,8 @@ onMounted(async () => {
   loadingSpiner.value = true;
 
   await fetchItems();
-  const storedItems = await store.getters['group/getAllGroupsInIndexedDB'];
-  console.log(storedItems);
-  groups.value = storedItems ? storedItems : store.getters['group/getAllGroups'];
-
-  // Postavljanje vrednosti za `localItems` kada se podaci učitaju
-  localItems.value = storedItems ? storedItems : groups.value;
+  groups.value = store.getters['group/getAllGroups'];
+  localItems.value = groups.value;
   loadingSpiner.value = false;
 });
 
@@ -92,8 +83,8 @@ const { isOpen, show, close } = showModal();
 const store = useStore();
 const groups = ref([]);
 const toast = useToast();
-const steps = shallowRef([{ component: GroupForm, props: { previousValue: {} } }
-  ,{ component: DeviceFormCheckBox, props: { previousValue: {} } }]);
+const steps = shallowRef([{ component: GroupForm, props: { previousValue: {},title:"Kreiraj novu grupu" } }
+  ,{ component: DeviceFormCheckBox, props: { previousValue: {},title:"Izaberi uredjaje" } }]);
 const newDevica = shallowRef([{ component: DeviceForm, props: { previousValue: {} } }]);
 
 const localItems = ref([]);

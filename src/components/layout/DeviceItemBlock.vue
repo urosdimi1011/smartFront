@@ -39,18 +39,19 @@
                     <button @click.stop="changeNameOfInput()">
                         <span><i class="fa-solid fa-pencil"></i></span>
                     </button>
+                  <button @click.stop="showConfigModal()" v-if="data.hasBrightness">
+                    <span><i class="fa-solid fa-gear"></i></span>
+
+                  </button>
                 </div>
             </transition>
         </div>
 
-
-
         <Teleport to="body">
-            <modal-layout :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
+            <modal-layout :props="defineMyProps" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
             </modal-layout>
-          <modal-layout  title="Promeni lozinku" :modalContent="modalContent"  :confirm="confirm" :visible="isOpen" :close="close()">
-
-          </modal-layout>
+<!--            <modal-layout title="Promeni lozinku" :modalContent="modalContent"  :confirm="confirm" :visible="isOpen" :close="close()">-->
+<!--            </modal-layout>-->
         </Teleport>
 
 
@@ -65,6 +66,7 @@ const { isOpen, show, close, confirm, modalContent } = showModal();
 // Ovo je globalan objekat sa podacima
 import store from '@/store';
 import { useToast } from 'vue-toastification';
+import BrightnessLayout from "@/components/layout/BrightnessLayout.vue";
 const toast = useToast();
 const props = defineProps({
     data: {
@@ -78,6 +80,7 @@ onUpdated(() => {
 const active = ref(props.data.status);
 const showInputField = ref(true);
 const doShowAdcConf = ref(false);
+const defineMyProps = ref([]);
 //Promena statusa uredjaju
 async function toggleActive() {
     // Ovde treba da se prosledi dispathc za promenu statusa device!
@@ -100,6 +103,10 @@ const tempName = ref(props.data.name);
 
 const removeDevice = () => {
     show(`Da li ste sigurni da zelite da obrisete uredjaj ${props.data.name}`, deleteDevice);
+}
+const showConfigModal = ()=>{
+  defineMyProps.value = {'id' : props.data.id, 'brightness': props.data.brightness}
+  show(BrightnessLayout);
 }
 
 const deleteDevice = async () => {
@@ -215,6 +222,7 @@ async function changeName() {
 .content-conf {
     display: flex;
     justify-content: space-between;
+    gap:10px;
     /* gap: 50%; */
 }
 
@@ -224,6 +232,7 @@ async function changeName() {
     width: 40%;
     margin-bottom: 4px;
     border-radius: 8%;
+    cursor:pointer;
 }
 
 .content-conf button:nth-child(1) {
@@ -232,6 +241,10 @@ async function changeName() {
 
 .content-conf button:nth-child(2) {
     background-color: green;
+}
+
+.content-conf button:nth-child(3) {
+  background-color: #cbcbcb;
 }
 
 .content-conf i {

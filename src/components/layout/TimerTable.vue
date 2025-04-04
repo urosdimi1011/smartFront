@@ -87,7 +87,7 @@
     <div class="spinner-container" v-if="timers == null">
         <ProgressSpinner />
     </div>
-    <modal-layout :modal-content="modalContent" :visible="isOpen" @close="close()">
+    <modal-layout :modal-content="modalContent" :visible="isOpen" @close="close()" :confirm="confirm">
 
     </modal-layout>
 </template>
@@ -113,10 +113,11 @@ import { showModal } from '@/composables/modal';
 
 const toast = useToast();
 const emit = defineEmits('close');
+const idTimer = ref(0);
 const timers = computed(() => {
     return store.getters['timer/getListOfTimer'];
 });
-const { isOpen, show, close,modalContent } = showModal();
+const { isOpen, show, close,modalContent,confirm } = showModal();
 
 const days = [
     { label: "Ponedeljak", value: 1 },
@@ -165,12 +166,13 @@ const devicesDisplay = computed(() => {
 })
 
 const removeTimer = (id) => {
-    show(`Da li ste sigurni da zelite da obrisete tajmer?`, removeTimerRealy(id));
+    idTimer.value = id;
+    show(`Da li ste sigurni da zelite da obrisete tajmer?`, removeTimerRealy);
 }
-const removeTimerRealy = async (id) => {
+const removeTimerRealy = async () => {
+  console.log(":USlii");
     try {
-
-        const response = await store.dispatch('timer/deleteTimer',{id});
+        const response = await store.dispatch('timer/deleteTimer',{id : idTimer.value});
         toast.success(response.data.message, {
             timeout: 3000
         });

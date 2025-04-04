@@ -17,10 +17,9 @@ export default {
         }
     },
     actions: {
-        async addDevice(_commit, payload) {
+        async addDevice({dispatch}, payload) {
             const response = await api.post('/api/device', payload);
-            // commit('setUser',response.data.user);
-            // commit('setJwtToken',response.data.token);
+            dispatch("group/getAllGroup", null, { root: true });
             return response;
         },
         async getAllDevices({ commit }) {
@@ -90,6 +89,17 @@ export default {
                 return response;
             }
             catch (error) {
+                throw Error(error.message);
+            }
+        },
+        async changeBrightnessForDevice({dispatch},{id,brightness}){
+            try {
+                const response = await api.patch(`/api/device/${id}`, {brightness});
+                await dispatch("group/getAllGroup", null, {root: true});
+                await dispatch("getAllDevices");
+                return response;
+            }
+            catch(error){
                 throw Error(error.message);
             }
         }

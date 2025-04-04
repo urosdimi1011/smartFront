@@ -7,6 +7,10 @@
             <FormInput id="name" name="name" label="Unesite naziv uredjaja: " />
             <FormInput v-model="checkedCategory" label="Izaberite kategoriju uredjaja" type="radio"
                 :options="allCategories" id="id_category" name="id_category" />
+            <template v-if="checkedCategory === 1">
+              <label>Da li vaš uređaj podržava brightness? </label>
+              <ToggleButton name="hasBrightness" v-model="hasBrightness" size="large" onLabel="Da" offLabel="Ne" />
+            </template>
             <div v-if="idGrupe">
                 <FormInput id="idGrupe" name="idGrupe" type="hidden" v-model="id_group" />
             </div>
@@ -21,6 +25,7 @@
           <ButtonMy class="form-button">Unesite uredjaj </ButtonMy>
             <p v-if="errorMsg">{{ errorMsg }}</p>
 
+<!--          <knob-block></knob-block>-->
 
         </Form>
     </div>
@@ -38,6 +43,9 @@ import { Form } from 'vee-validate';
 import FormInput from '../../components/ui/FormInput.vue';
 import { useStore } from 'vuex';
 import ButtonMy from '@/components/ui/ButtonMy.vue';
+// import KnobBlock from "@/components/layout/KnobBlock.vue";
+import ToggleButton from "primevue/togglebutton";
+
 const store = useStore();
 const randomNumber = ref(0);
 const allCategories = computed(() => {
@@ -62,6 +70,7 @@ const errorMsg = ref('');
 const showAdvanced = ref(false);
 const id_group = ref(props.idGrupe);
 const tempLink = ref('');
+const hasBrightness = ref(false);
 
 const schema = yup.object({
     ssid: yup.string().required("Morate uneti SSID"),
@@ -79,13 +88,11 @@ const submit = async (values) => {
     try {
         errorMsg.value = "";
         let response = await store.dispatch('device/addDevice', {
-            ...values
+            ...values, hasBrightness: Number(hasBrightness.value)
         });
         tempLink.value = response.data.url;
         check.value = true;
         // window.location.href= tempLink;
-
-
     }
     catch (poruka) {
         errorMsg.value = poruka;
