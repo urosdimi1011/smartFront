@@ -1,11 +1,6 @@
 <template>
-  <!-- <div>
-
-    
-  </div> -->
-  <div v-if="dataLocal.temperature" :data-id="data.id" class="lamp background-block">
+  <div v-if="dataLocal.termostat" :data-id="data.id" class="lamp background-block">
     <h2>{{ dataLocal.name }}</h2>
-
     <div class="center">
       <Knob readonly v-model="changedTemperature" :min="0" :max="30" :step="1" :size="200" valueColor="#4caf50"
         rangeColor="#e0e0e0" />
@@ -14,36 +9,46 @@
         <Button icon="pi pi-minus" @click="changedTemperature--" :disabled="changedTemperature <= 18" />
       </div>
     </div>
-    <p>Trenutna temperatura: {{ dataLocal.temperature }}°C</p>
-    <p class="text">Trenutni status: <span class="color-green">UKLJUČENO</span></p>
+    <template v-if="temperatureInfo.last_reading_of_termostat">
+      <p>Trenutna temperatura: {{ temperatureInfo.last_reading_of_termostat }}°C</p>
+    </template>
+    <template v-else>
+      <p>Tretnurno nema očitane temperature</p>
+    </template>
+    <p class="text">Trenutni status:
+      <template v-if="dataLocal.status">
+        <span class="color-green">UKLJUČENO</span>
+      </template>
+      <template v-else>
+        <span class="color-red">ISKLJUČENO</span>
+      </template>
+    </p>
+    <div class="maintain-block">
+      <FormInput
+          v-model="maintainTermostat"
+          id="maintain_temperature"
+          name="maintain_temperature"
+          type="checkbox"
+          class="d-flex"
+          label="Održavaj temperaturu"
+      />
+    </div>
     <h3>Promeni status</h3>
     <ToggleButton v-model="checked" size="large" onLabel="Ukljuceno" offLabel="Iskljuceno" />
-    <Button>Sacuvaj</Button>
-
-    <!-- <div v-if="data.temperature">
-      <TemperatureChart :temperature="data.temperature" />
-      <button @click="seeDetails()">Pogledaj detalje</button>
-    </div>
-    <div v-else>
-      <p>
-        Trenutno nema ucitanih uredjaja za tu sobu.
-      </p>
-      <button @click="addDeviceForHeating()">Dodaj uredjaj za grejanje</button>
-      <button @click="addDeviceForHeating()">Dodaj uredjaj za merenje temperature</button>
-    </div> -->
+    <Button @click="submit()">Sacuvaj</Button>
   </div>
   <div class="lamp background-block" v-else>
-    <h3>Trenutno nema dodate temperature za uredjaj <strong>{{ data.name }}</strong></h3>
+    <h3>Trenutno nema dodati termostat za uredjaj <strong>{{ data.name }}</strong></h3>
     <ButtonMy @click="showModalMy()">Dodajte termostat</ButtonMy>
   </div>
   <Teleport to="body">
-    <modal-layout :modal-content="modalContent" v-if="isOpen" :visible="isOpen" @close="ugasi()"
+    <modal-layout :title="titleOfForm" :modal-content="modalContent" v-if="isOpen" :visible="isOpen" @close="ugasi()"
       @getDatas="setToStepRecivedData" @finish="sendAllData">
       <template #body>
         <SelectingFormView :textOnButtons="textOnButton" :showModals="showModals" v-if="activeForms === ''"
           @changeForms="setNewForms" />
-        <TempDeviceForm :idDevice="dataLocal.id" v-if="activeForms === 'newTermo'" />
-        <!-- <DeviceFormCheckBox v-if="activeForms === 'existingTermo'" /> -->
+        <TempDeviceForm :idDevice="dataLocal.id" v-if="activeForms === 'newTermo'" @close="ugasi()"/>
+        <TermostatFormCheck :idDevice="dataLocal.id" v-if="activeForms === 'existingTermo'" @close="ugasi()"/>
 
       </template>
     </modal-layout>
@@ -55,11 +60,14 @@ import Button from 'primevue/button';
 import ToggleButton from 'primevue/togglebutton';
 import modalLayout from '../modalLayout.vue';
 import { showModal } from '../../composables/modal'; // Uvođenje composable-a
-import { defineProps, ref, watch } from 'vue';
+import {computed, defineProps, onUnmounted, ref, watch, onUpdated, inject} from 'vue';
+import {useStore} from 'vuex';
 import SelectingFormView from '@/features/others/selectingFormView.vue';
-// import TemperatureChart from '../ui/TemperatureChart.vue';
 import TempDeviceForm from '@/features/devices/TempDeviceForm.vue';
-// import DetailsForTemperature from './DetailsForTemperature.vue';
+import TermostatFormCheck from "@/features/termostat/TermostatFormCheck.vue";
+import FormInput from "@/components/ui/FormInput.vue";
+import { useToast } from 'vue-toastification';
+
 const props = defineProps({
   data: {
     type: Object,
@@ -69,53 +77,82 @@ const props = defineProps({
 const activeForms = ref('');
 const textOnButton = ref(['Dodaj novi termostat','Dodaj vec postojeci termostat']);
 const showModals = ref(['newTermo','existingTermo']);
-const setNewForms = (selectedForms) => activeForms.value = selectedForms;
-const checked = ref(false);
-const changedTemperature = ref(props.data.temperature);
+const titleOfForm = ref('');
+const store = useStore();
+const toast = useToast();
+
+const temperatureInfo = computed(()=>{
+  return dataLocal.value.termostat;
+})
+const setNewForms = (selectedForms) => {
+  if(selectedForms === 'newTermo'){
+    titleOfForm.value = "Dodajte novi termostat";
+  }
+  else if(selectedForms === 'existingTermo'){
+    titleOfForm.value = 'Izaberite termostat';
+  }
+  activeForms.value = selectedForms
+};
 const dataLocal = ref(props.data);
+const checked = ref(dataLocal.value.status);
+const maintainTermostat = ref(
+    !!dataLocal.value?.termostat?.maintain_temperature
+);
+const selectedType = inject('selectedType');
+
+const changedTemperature = ref(
+    dataLocal.value?.termostat?.desired_temperature ??
+    dataLocal.value?.termostat?.last_reading_of_termostat ?? 0
+);
 const { isOpen, show, close, modalContent } = showModal();
 
 const showModalMy = () => {
   show("Izaberite opciju:");
 }
-// const steps = shallowRef([{ component: TempDeviceForm, props: { previousValue: {},idDevice : props.data.id } }
-//   , {component: TempDeviceForm,props: { previousValue: {},idDevice : props.data.id }}]);
-
-// const setToStepRecivedData = (data) => {
-//   steps.value[data.step - 1].props.previousValue = data;
-// }
-
-// const resetAllInputs = ()=>{
-//   steps.value.forEach((x)=>{
-//     x.props.previousValue = {};
-//   })
-// }
-// const sendAllData = () =>{
-//   console.log(steps.value);
-// }
 const ugasi = () => {
+  activeForms.value = "";
+  titleOfForm.value = "";
   // resetAllInputs();
   close();
 }
+onUnmounted(()=>{
+  activeForms.value = "";
+})
 
+onUpdated(()=>{
+  console.log("Uslii");
+})
 
 watch(() => props.data, (newValue) => {
   dataLocal.value = newValue;
-  changedTemperature.value = newValue.temperature;
+  changedTemperature.value = newValue?.termostat?.desired_temperature ?? newValue?.termostat?.last_reading_of_termostat ?? 0
+  maintainTermostat.value = Boolean(newValue?.termostat?.maintain_temperature);
 })
+const submit = async ()=>{
+//   Znaci treba da posaljem id tog uredjaja i da li da se uredjaj upali ili ugasi i setovanu temperaturu
+  //znaci podaci su sledeci
+  //idUredjaja
+  //status
+  //odabranaTemperatura
+  try{
+    const dataForSend=  {
+      "status":checked.value,
+      "desired_temperature" : changedTemperature.value,
+      "termostat_id":dataLocal.value.termostat.id,
+      'maintain_temperature': maintainTermostat.value ? 1 : 0
+    }
 
-// const seeDetali = ref(false);
+    const response = await store.dispatch('device/setDataOfDeviceForTemperature',{data : dataForSend,id : dataLocal.value.id,});
+    await store.dispatch('device/getAllDevicesForTemperature',selectedType.value);
 
-// function seeDetails() {
-//   show();
-//   seeDetali.value = true;
-// }
+    toast.success(response.data.message,{timeout:3000});
+  }
+  catch (error){
+    toast.error(error.message,{timeout:3000});
+  }
 
-// function addDeviceForHeating() {
-//   show();
-//   seeDetali.value = false;
-// }
 
+}
 </script>
 <style scoped>
 .center {
@@ -145,7 +182,11 @@ watch(() => props.data, (newValue) => {
 .text span {
   font-weight: bold;
 }
-
+.d-flex{
+  display: flex;
+  justify-content: center;
+  gap:20px;
+}
 .groups-items {
   border-top: 1px solid black;
   border-bottom: 1px solid black;
@@ -167,6 +208,9 @@ watch(() => props.data, (newValue) => {
 
 .color-green {
   color: rgba(0, 255, 0, 0.9);
+}
+.color-red{
+  color : #7f0000;
 }
 
 h3 {

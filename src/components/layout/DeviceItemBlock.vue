@@ -2,15 +2,16 @@
 <!--  ,offline : data.is_out_of_range-->
 <!--  !data.is_out_of_range ? toggleActive() : null-->
     <div @click.stop="!data.is_out_of_range ? toggleActive() : null" :data-id="data.id" class="lamp background-block" :class="{active: active,offline : data.is_out_of_range }">
-       <div class="content-up">
+      <info-tooltip :text="printTextFotTooltip()"></info-tooltip>
+      <div class="content-up">
          <div>
-                <template v-if="data.category.name == 'Plug' && data.status == 0">
+                <template v-if="data.category.name === 'Plug' && data.status === 0">
                     <PhPlugs :size="48" />
                 </template>
-                <template v-if="data.category.name == 'Plug' && data.status">
+                <template v-if="data.category.name === 'Plug' && data.status">
                     <PhPlugsConnected :size="48" />
                 </template>
-                <template v-if="data.category.name != 'Plug'">
+                <template v-if="data.category.name !== 'Plug'">
                     <i :class="data.category.icon"></i>
                 </template>
                 <div v-if="showInputField" class="name-block">
@@ -48,7 +49,7 @@
         </div>
 
         <Teleport to="body">
-            <modal-layout :props="defineMyProps" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
+            <modal-layout :title="titleOfModal" :props="defineMyProps" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
             </modal-layout>
 <!--            <modal-layout title="Promeni lozinku" :modalContent="modalContent"  :confirm="confirm" :visible="isOpen" :close="close()">-->
 <!--            </modal-layout>-->
@@ -67,6 +68,7 @@ const { isOpen, show, close, confirm, modalContent } = showModal();
 import store from '@/store';
 import { useToast } from 'vue-toastification';
 import BrightnessLayout from "@/components/layout/BrightnessLayout.vue";
+import InfoTooltip from "@/components/ui/InfoTooltip.vue";
 const toast = useToast();
 const props = defineProps({
     data: {
@@ -81,6 +83,7 @@ const active = ref(props.data.status);
 const showInputField = ref(true);
 const doShowAdcConf = ref(false);
 const defineMyProps = ref([]);
+const titleOfModal = ref("");
 //Promena statusa uredjaju
 async function toggleActive() {
     // Ovde treba da se prosledi dispathc za promenu statusa device!
@@ -100,12 +103,19 @@ async function toggleActive() {
 }
 
 const tempName = ref(props.data.name);
-
+const printTextFotTooltip = ()=>{
+  return `<ul>
+    <li>Board uredjaja: <strong>${props.data.board}</strong></li>
+    <li>Pin uredjaja: <strong>${props.data.pin}</strong></li>
+</ul>`
+}
 const removeDevice = () => {
-    show(`Da li ste sigurni da zelite da obrisete uredjaj ${props.data.name}`, deleteDevice);
+  titleOfModal.value = "Potvrda";
+  show(`Da li ste sigurni da zelite da obrisete uredjaj ${props.data.name}`, deleteDevice);
 }
 const showConfigModal = ()=>{
   defineMyProps.value = {'id' : props.data.id, 'brightness': props.data.brightness}
+  titleOfModal.value = "Podesite osvetljenje";
   show(BrightnessLayout);
 }
 
@@ -151,6 +161,9 @@ async function changeName() {
 <style>
 .color-button{
   background-color: #87c33e !important;
+}
+ul{
+  list-style-type:none;
 }
 .form-change-input button {
     width: 40%;

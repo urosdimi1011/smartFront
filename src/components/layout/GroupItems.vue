@@ -10,7 +10,7 @@
                   <button-my @click="changeGroupName()">Izmeni</button-my>
                 </div>
                 
-                <ButtonMy :disabled="checkRangeOfDevice()" @click.stop="turnOnAll($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll"><input :id="'activeAllItems' + id" :checked="devicesAllTurn" disabled class="moje2" :class="{moje : devicesAllTurn}"
+                <ButtonMy  @click.stop="turnOnAll($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll"><input :id="'activeAllItems' + id" :checked="devicesAllTurn" disabled class="moje2" :class="{moje : devicesAllTurn}"
                         type="checkbox" /><label :for="'activeAllItems' + id" class="arrowPravi"
                         ></label></ButtonMy>
 
@@ -24,13 +24,16 @@
             </div>
             <transition name="slidedown" mode="out-in">
                 <div v-if="showMenuProp || automaticOpen" class="slide-menu main">
-                    <template v-if="devices && devices.length">
+                    <template v-if="devices && devices.length > 0">
                         <item-block v-for="item in devices" :key="item.id" :data="item">
                         </item-block>
                     </template>
-                    <template v-else>
-                        <p class="text-info">Trenutno nemate uredjaje u grupi</p>
+                    <template v-if="devices && devices.length === 0">
+                        <p class="text-info">Trenutno nemate uređaje u grupi</p>
                     </template>
+                  <template v-if="!devices">
+                    <ProgressSpinner/>
+                  </template>
                     <div v-if="addDeviceOptions" class="w-100 d-flex-center">
                         <div class="lamp background-block" @click="show()">
                             <a href="#"><i class="fa-solid fa-plus"></i></a>
@@ -39,12 +42,7 @@
                 </div>
             </transition>
           <Teleport to="body">
-            <modal-layout :modal-content="modalContent" :confirm="confirm" :visible="isOpen" @close="closeModal()">
-              <template #header>
-                <!-- <div class="modal-header">
-                    <h2>Unesite uredjaj</h2>
-                </div> -->
-              </template>
+            <modal-layout :title="titleOfModal" :modal-content="modalContent" :confirm="confirm" :visible="isOpen" @close="closeModal()">
               <template #body>
                 <!-- Vidi da li moze da se ovo bolje odradi! -->
                 <SelectingFormView :textOnButtons="textOnButton" :showModals="showModals" v-if="activeForms === ''" @changeForms="setNewForms" />
@@ -62,7 +60,7 @@
 import { ref, defineProps, computed, watch} from 'vue';
 import itemBlock from './itemBlock.vue';
 import modalLayout from '../modalLayout.vue';
-import { showModal } from '../../composables/modal'; // Uvođenje composable-a
+import { showModal } from '@/composables/modal'; // Uvođenje composable-a
 import SelectingFormView from '@/features/others/selectingFormView.vue';
 import DeviceForm from '@/features/devices/DeviceForm.vue';
 import DeviceFormCheckBox from '@/features/devices/DeviceFormCheckBox.vue';
@@ -70,6 +68,8 @@ import store from '@/store';
 import { useToast } from 'vue-toastification';
 import ButtonMy from "@/components/ui/ButtonMy.vue";
 import FormInput from "@/components/ui/FormInput.vue";
+import ProgressSpinner from 'primevue/progressspinner';
+
 // import device from '@/store/modules/device';
 
 const showMenuProp = ref(false);
@@ -78,6 +78,7 @@ const turnAllClassActive = ref(false);
 let activeForms = ref('');
 const shouldTurnOn = ref(false);
 const doesChangeGroupName = ref(false);
+const titleOfModal = ref('');
 const textOnButton = ref(['Dodaj novi uredjaj','Dodaj vec postojeci uredjaj']);
 const showModals = ref(['newDevice','addDevice']);
 const toast = useToast();
@@ -113,12 +114,12 @@ watch(()=>props.devices,(newValue)=>{
     devicesProba.value = newValue;
 })
 
-const checkRangeOfDevice = ()=>{
-  return props.devices.some(x=>x.is_out_of_range);
-}
+// const checkRangeOfDevice = ()=>{
+//   return props.devices.some(x=>x.is_out_of_range);
+// }
 const closeModal = () => {
-    close();
     activeForms.value = "";
+    close();
 }
 const devicesAllTurn = computed(()=>{
     if(devicesProba.value){
@@ -126,17 +127,27 @@ const devicesAllTurn = computed(()=>{
     }
     return false;
 });
-const setNewForms = (selectedForms) => activeForms.value = selectedForms;
+const setNewForms = (selectedForms) => {
+  if(selectedForms === 'newDevice'){
+    titleOfModal.value = "Dodaj uređaj";
+  }
+  else if(selectedForms === 'addDevice'){
+    titleOfModal.value = 'Izaberi uređaj';
+  }
+  activeForms.value = selectedForms
+};
 function turnOnAll() {
     activeForms.value = null;
     shouldTurnOn.value = devicesProba.value.filter(device => device.status).length!==devicesProba.value.length;
+    titleOfModal.value = 'Pitanje';
     show(`Da li da zelite sve uredjaje da ${shouldTurnOn.value ? 'upalite' : 'ugasite'}?`, turnAllDevice);
 }
 
 async function turnAllDevice(){
     turnAllClassActive.value = !turnAllClassActive.value;
     try{
-        await store.dispatch("device/changeStautsOfDeviceInGroup",{status:shouldTurnOn.value,id:props.id});
+      const devicesIds = mappingDevicesToIds();
+        await store.dispatch("device/changeStautsOfDeviceInGroup",{status:shouldTurnOn.value,id:props.id,ids:devicesIds});
         toast.success('Uspesno ste promenili status uredjaja u grupi', {
             timeout: 3000
         });
@@ -146,6 +157,10 @@ async function turnAllDevice(){
             timeout: 3000
         });
     }
+}
+
+function mappingDevicesToIds(){
+  return props.devices.map((x)=>x.id);
 }
 
 function showMenu() {
@@ -167,11 +182,11 @@ const removeGroup = async () => {
 }
 const confirmDelete = ()=>{
     activeForms.value = null;
+    titleOfModal.value = 'Pitanje';
     show(`Da li ste sigurni da želite da obrišete grupu "${props.groupName}"?`, removeGroup);
 }
 
 const changeGroupName = async ()=>{
-  console.log(newGroupName.value);
   const data = {
     name : newGroupName.value,
     id: props.id
@@ -251,7 +266,7 @@ const newGroupName = ref(props.groupName);
     display: block;
     width: 0%;
     height: 5px;
-    background-color: green;
+    background-color: #4da34d;
     transition: all 500ms;
     position: absolute;
     top: 0px;

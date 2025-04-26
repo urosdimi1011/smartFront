@@ -1,8 +1,8 @@
 import axios from 'axios';
 import store from '@/store'; // Importuj Vuex store
 const instance = axios.create({
-    baseURL: 'http://localhost:8000',  // Ovde stavite svoju osnovnu URL adresu
-    timeout: 10000,  // Timeout za zahteve (10 sekundi)
+    baseURL: 'http://127.0.0.1:8000',  // Ovde stavite svoju osnovnu URL adresu
+    timeout: 20000,  // Timeout za zahteve (10 sekundi)
     headers: {
         'Content-Type': 'application/json',
     }
@@ -30,7 +30,7 @@ instance.interceptors.response.use(response => response, async error => {
                 return axios.request(error.config);
             }
             else {
-                store.dispatch("user/logout");
+                await store.dispatch("user/logout");
                 return Promise.reject(error);
             }
         }

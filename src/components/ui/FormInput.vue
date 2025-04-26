@@ -12,12 +12,26 @@
             <div v-for="option of options" :key="option.id">
                 <label :for="`${option.name.split(' ').join('_')}${option.id}`">{{ option.name }}</label>
                 <Field checked="true" :name="name" type="checkbox" :value="option.id" v-slot="{ field, meta }">
-                    <Checkbox v-bind="field" :name="name" :id="`${option.name.split(' ').join('_')}${option.id}`"
+                    <Checkbox v-bind="field" :name="name" :inputId="`${option.name.split(' ').join('_')}${option.id}`"
                         :value="option.id" @change="$emit('update:modelValue', meta.value)" v-model="proba" />
                 </Field>
             </div>
         </div>
-
+      <div v-if="type === 'checkbox' && !options">
+        <Field
+            :name="name"
+            type="checkbox"
+            v-slot="{ field }"
+        >
+          <Checkbox
+              v-model="proba"
+              v-bind="field"
+              :inputId="id"
+              :name="name"
+              binary
+          />
+        </Field>
+      </div>
         <div v-if="type === 'radio' && options && options.length" class="w">
             <div v-for="option of options" :key="option.id">
                 <label :for="`${option.name.split(' ').join('_')}${option.id}`">{{ option.name }}</label>
@@ -32,7 +46,7 @@
     </div>
 </template>
 <script setup>
-import { defineProps, defineEmits, onUpdated, computed } from 'vue';
+import { defineProps, defineEmits, onUpdated, computed,defineOptions } from 'vue';
 import { Field, ErrorMessage } from 'vee-validate';
 import { Checkbox, MultiSelect, RadioButton } from 'primevue';
 const props = defineProps({
@@ -57,7 +71,7 @@ const props = defineProps({
         required:false
     },
     modelValue: {
-        type: [String, Array], // Podržava string ili niz za MultiSelect
+        type: [String, Array,Boolean], // Podržava string ili niz za MultiSelect
         required: false,
     },
     multiSelect: {
@@ -70,8 +84,9 @@ const props = defineProps({
         required: false
     }
 });
-
-
+defineOptions({
+  inheritAttrs: true
+})
 onUpdated(() => {
     if (props.multiSelect) {
         emit('update:modelValue', selected.value);
@@ -81,7 +96,6 @@ onUpdated(() => {
 const proba = computed({
     get: () => props.modelValue,
     set: (newValue) => {
-        console.log(newValue);
         emit('update:modelValue', newValue)
     }
 });
@@ -132,5 +146,8 @@ input {
   color: white;
   border:none;
   border-bottom: 2px solid white;
+}
+.d-flex{
+  display: flex;
 }
 </style>

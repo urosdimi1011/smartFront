@@ -10,22 +10,25 @@
     -->
 
 
-        <FormInput id="nameOfTermostat" name="nameOfTermostat" label="Upisite naziv termostata: "/>
+        <FormInput id="name" name="name" label="Upisite naziv termostata: "/>
         <FormInput id="numberOfTermostate" name="numberOfTermostate" label="Upisite Vas redni broj termostata: "/>
         <FormInput id="locationOfSenzor" name="locationOfSenzor" label="Upisite lokaciju vaseg senzora: " />
         <!-- Ovde ce mi stajati ovo polje samo u zavisnoti koji uredjaj dodajem, dal bio za grejanje, a dal za hladjenje,
                 tu cu da saljem samo id tipa uredjaja koji zelim da dodam!! 
             -->
-        <FormInput id="idTipUredjajaa" name="idTipUredjajaa" type="hidden" v-model="idUredjaja" />
-        <button class="form-button">Unesite termostat </button>
+        <FormInput id="idDevice" name="idDevice" type="hidden" v-model="idUredjaja" />
+        <button-my>Unesite termostat </button-my>
         </Form>
     </div>
 </template>
 <script setup>
 import * as yup from 'yup';
-import { defineProps, ref, watch, onUpdated,defineEmits,defineExpose,reactive } from 'vue';
+import {defineProps, ref, watch, defineEmits, defineExpose, reactive, inject} from 'vue';
 import { useForm,Form } from 'vee-validate';
 import FormInput from '../../components/ui/FormInput.vue';
+import ButtonMy from "@/components/ui/ButtonMy.vue";
+import {useStore} from "vuex";
+import {useToast} from "vue-toastification";
 
 const props = defineProps({
     idDevice: {
@@ -38,31 +41,38 @@ const props = defineProps({
         default: () => ({})
     }
 });
-
+const store = useStore();
+const toast = useToast();
 const formValues = reactive({
     ...props.previousValue || '',
 });
 const schema = yup.object({
-        nameOfTermostat: yup.string().min(3,"Naziv termostata mora da sadrzi barem 3 karaktera").required("Morate staviti naziv termostata"),
-        numberOfTermostate: yup.string().required("Morate dodati broj termostata"),
-        locationOfSenzor: yup.string().required("Morate dodati lokaciju termostata").min(3),
+  name: yup.string().min(3,"Naziv termostata mora da sadrzi barem 3 karaktera").required("Morate staviti naziv termostata"),
+  numberOfTermostate: yup.string().required("Morate dodati broj termostata"),
+  locationOfSenzor: yup.string().required("Morate dodati lokaciju termostata").min(3),
 });
 const { validate  } = useForm({
     validationSchema: schema,
     initialValues:props.previousValue
 });
-const submit = (values)=>{
-    console.log(values);
+const selectedType = inject('selectedType');
+const submit = async (values)=>{
+    try{
+      await store.dispatch('termostat/addTermostat',values);
+      await store.dispatch('device/getAllDevicesForTemperature',selectedType.value);
+      emit('close');
+      toast.success("Uspesno ste dodali termostat",{
+        timeout : 3000
+      })
+    }
+    catch (error){
+      toast.error(`${error}`,{
+        timeout : 3000
+      })
+    }
 }
 defineExpose({validate});
 const emit = defineEmits('onSubmit');
-
-// const [numberOfTermostateField, numberOfTermostateAttr] = defineField('numberOfTermostate');
-
-
-onUpdated(() => {
-    console.log("Usli zbog promene")
-})
 watch(
     formValues,
     (newValues) => {

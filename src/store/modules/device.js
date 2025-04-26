@@ -3,17 +3,24 @@ import api from "@/config/axios";
 export default {
     namespaced: true,
     state: () => ({
-        device: null
+        device: null,
+        deviceForTemperature : null
     }),
     getters: {
         getAllDevices(state) {
             return state.device;
+        },
+        getDeviceOfTemperatureForSelectedType(state){
+            return state.deviceForTemperature;
         }
     },
     mutations: {
         setDevice(state, payload) {
             state.device = payload;
 
+        },
+        setDeviceForTemperature(state,payload){
+            state.deviceForTemperature = payload;
         }
     },
     actions: {
@@ -22,9 +29,15 @@ export default {
             dispatch("group/getAllGroup", null, { root: true });
             return response;
         },
-        async getAllDevices({ commit }) {
+        async getAllDevices({ commit },typeId = null) {
             try {
-                const response = await api.get('/api/device');
+                let response = null;
+                if(typeId !== null){
+                    response = await api.get(`/api/device?typeId=${typeId}`);
+                }
+                else{
+                    response = await api.get('/api/device');
+                }
                 commit('setDevice', response.data.devices);
                 return response.data.devices;
             }
@@ -46,9 +59,9 @@ export default {
             }
 
         },
-        async changeStautsOfDeviceInGroup({ dispatch }, { id, status }) {
+        async changeStautsOfDeviceInGroup({ dispatch }, { id, status,ids }) {
             try {
-                const response = await api.patch(`/api/device/group/${id}`, { status });
+                const response = await api.patch(`/api/device/group/${id}`, { status,ids });
                 await dispatch("group/getAllGroup", null, { root: true });
                 await dispatch("getAllDevices");
                 return response;
@@ -97,6 +110,26 @@ export default {
                 const response = await api.patch(`/api/device/${id}`, {brightness});
                 await dispatch("group/getAllGroup", null, {root: true});
                 await dispatch("getAllDevices");
+                return response;
+            }
+            catch(error){
+                throw Error(error.message);
+            }
+        },
+        async getAllDevicesForTemperature({commit},type){
+            try {
+                const response = await api.get(`/api/devicesWithTermostat?type=${type}`);
+                commit('setDeviceForTemperature',response.data.data);
+                return response;
+            }
+            catch(error){
+                throw Error(error.message);
+            }
+        },
+        async setDataOfDeviceForTemperature({commit},payload){
+            try {
+                const response = await api.post(`/api/setDataOfDeviceForTemperature/${payload.id}`,payload.data);
+                commit('setDeviceForTemperature',response.data.data);
                 return response;
             }
             catch(error){

@@ -1,24 +1,32 @@
 <template>
     <Form @submit="submit" :initial-values="formValues" :validation-schema="schema">
-        <template v-if="deviceOptions.length">
+        <template v-if="deviceOptions && deviceOptions.length > 0">
             <FormInput v-model="devices" label="Izaberite uredjaje" type="checkbox" :options="deviceOptions"
                 id="devices" name="devices" />
             <template v-if="stepForm">
                 <ButtonMy>Dodaj</ButtonMy>
             </template>
         </template>
-        <template v-else>
-            <p>Trenutno nema dodatih uredjaja</p>
+      <template v-if="deviceOptions && deviceOptions.length === 0">
+        <p>Trenutno nema dodatih uredjaja</p>
+      </template>
+        <template v-if="!deviceOptions">
+          <ProgressSpinner/>
         </template>
     </Form>
 </template>
 <script setup>
 import * as yup from 'yup';
 import { Form, useForm, useField } from 'vee-validate';
-import { ref, onMounted, defineProps, defineEmits, watch, defineExpose, computed,reactive } from 'vue';
+import { ref, onMounted, defineProps, defineEmits, watch, defineExpose, computed,reactive,inject } from 'vue';
 import FormInput from '@/components/ui/FormInput.vue';
 import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
+import ProgressSpinner from 'primevue/progressspinner';
+
+
+const idCategory = inject('idCategory');
+
 //Ovo smo stavili iz razloga zato sto props ne moze da se menja, a nama je props previousValue, koji sadrzi sve podatke!!!!
 // const devicesChecked = ref([]);
 
@@ -50,7 +58,7 @@ const schema = yup.object().shape({
           "at-least-one-checked",
           "Morate odabrati bar jedan uređaj",
           (devicesLocal) => {
-            if (deviceOptions.value.length === 0 && devicesLocal && devicesLocal.length === 0) return true;
+            if (deviceOptions.value && deviceOptions.value.length === 0 && devicesLocal && devicesLocal.length === 0) return true;
             return devicesLocal && Array.isArray(devicesLocal) && devicesLocal.length > 0;
           }
       )
@@ -62,13 +70,11 @@ const { validate } = useForm({
 });
 const { value: devices } = useField('devices');
 
-const deviceOptions = ref([]);
+const deviceOptions = ref(null);
 
 defineExpose({ validate});
 
 function isValidSync(data) {
-  console.log("asdad");
-
     try {
         schema.validateSync(data); // Ako nije validno, baca grešku
         return true; // Ako validacija uspe
@@ -93,14 +99,18 @@ watch(devices, (newVal) => {
 
 async function getAllDevices() {
     try {
-
+      if(idCategory){
+        const response = await store.dispatch("device/getAllDevices",parseInt(idCategory));
+        setDeviceOptions(response);
+      }
+      else{
         const response = await store.dispatch("device/getAllDevices");
-        deviceOptions.value = response  ;
+        setDeviceOptions(response)
+      }
     }
     catch (error) {
-        console.log(error);
+      toast.error(error,{timeout:3000});
     }
-    // const response = await fetch('/api/devices.json');
 }
 
 
@@ -110,20 +120,26 @@ const sendDataToModal = (newVal) => {
 
 onMounted(async () => {
     await getAllDevices();
-    // sendDataToModal({});
     // Postavljanje inicijalnih vrednosti za čekirane uređaje
     if (props.previousValue.devices) {
-        devices.value = props.previousValue.devices;
+      setDefaultValueForDeviceWhenComponentIsLoaded(props.previousValue.devices);
     }
     else{
-        if(props.stepForm)
-        devices.value=groups.value;
+        if(props.stepForm){
+          setDefaultValueForDeviceWhenComponentIsLoaded(groups.value);
+        }
     }
-
 });
 
+const setDefaultValueForDeviceWhenComponentIsLoaded = (data)=>{
+  devices.value = data;
+}
+
+const setDeviceOptions = (data)=>{
+  deviceOptions.value = data;
+}
+
 async function submit(values) {
-  console.log(values);
     if (props.stepForm) {
         try {
             const response = await store.dispatch('group/AddDevicesInGroup', { id: props.idGrupe, ...values });

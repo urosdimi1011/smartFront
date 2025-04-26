@@ -12,6 +12,7 @@ export default {
             return state.groups;
         },
         getAllFilterGroup: (state) => (id) => {
+            // Ovde u memoriji filtriramo grupe sa odredjenim id-jevima kategorija za uredjaje!
             if (!state.groups || state.groups.length === 0) {
                 return []; 
             }
@@ -19,6 +20,7 @@ export default {
             .map(group => {
                 const filteredDevices = group.devices.filter(device => device.id_category === parseInt(id));
                 if (filteredDevices.length > 0) {
+                    //Ovako gazim devices propery u group objektu!
                     return { ...group, devices: filteredDevices };
                 }
                 return null;
@@ -125,7 +127,6 @@ export default {
         },
         async changeGroupName({dispatch},payload){
             try {
-                console.log(payload);
                 const response = await api.patch(`/api/group/${payload.id}`, {"name": payload.name});
                 dispatch('getAllGroup');
                 return response

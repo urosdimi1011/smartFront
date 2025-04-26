@@ -5,25 +5,34 @@
       <router-link to="/" exact v-slot="{ isActive }">
         <input id="home" type="radio" name="tabsMenu" :class="{ active: isActive }" />
       </router-link>
-      <!-- <template v-for="cat in allCategories"> -->
-      <router-link v-for="cat in allCategories" :key="cat.id"
-        :to="{ name: routeLink(cat), params: { idCategories: cat.id } }" v-slot="{ isActive }">
-        <input :id="cat.name" type="radio" name="tabsMenu" :class="{ active: isActive }" />
-      </router-link>
-      <!-- </template> -->
-      <!-- <router-link to="/light" v-slot="{ isActive }">
-        <input id="light" type="radio" name="tabsMenu" :class="{ active: isActive }" />
-      </router-link>
-      <router-link to="/temperature" v-slot="{ isActive }">
+
+      <template v-for="cat in allCategories" :key="cat.id">
+        <template v-if="cat.name !== 'Heating' && cat.name !== 'Cooling'">
+          <router-link
+              :to="{ name: routeLink(cat), params: { idCategories: cat.id } }" v-slot="{ isActive }">
+            <input :id="cat.name" type="radio" name="tabsMenu" :class="{ active: isActive }" />
+          </router-link>
+        </template>
+      </template>
+      <router-link
+          :to="{ name: 'Temperature', }" v-slot="{ isActive }">
         <input id="temperature" type="radio" name="tabsMenu" :class="{ active: isActive }" />
-      </router-link> -->
+      </router-link>
 
       <div class="buttons">
         <label for="home" :class="{ 'active-tab': isActive('/') }"><i class="fa-solid fa-house"></i></label>
         <template v-if="allCategories">
-          <label v-for="cat in allCategories" :key="cat.id" :for="cat.name"
-            :class="{ 'active-tab': isActive('/' + cat.name === '/Heating/Cooling' ? '/temperature' : '/' + cat.name) }"><i
-              :class="cat.icon"></i></label>
+          <template v-for="cat in allCategories" :key="cat.id">
+            <template v-if="cat.name !== 'Heating' && cat.name !== 'Cooling'">
+
+            <label :for="cat.name"
+                     :class="{ 'active-tab': isActive('/' + cat.name) }"><i
+                  :class="cat.icon"></i></label>
+            </template>
+          </template>
+          <label for="temperature"
+                 :class="{ 'active-tab': isActive('/temperature' ) }"><i
+              class="fa-regular fa-snowflake"></i></label>
           <div class="underline"></div>
         </template>
         <template v-else>
@@ -42,11 +51,11 @@
     </div>
 
     <div class="main-moj container">
-      <transition name="slide" mode="out-in">
-          <router-view :key="$route.fullPath" v-slot="{ Component }">
-              <component :is="Component"  v-if="Component" />
-          </router-view>
-      </transition>
+      <router-view v-slot="{ Component }" :key="$route.fullPath">
+        <transition name="slide" mode="out-in">
+          <component :is="Component" v-if="Component" />
+        </transition>
+      </router-view>
 
     </div>
 
@@ -212,7 +221,9 @@ a {
 input:focus {
   touch-action: manipulation;
 }
-
+.form-group span{
+  color:rgba(255,0,0,0.5);
+}
 .close-button{
   overflow: hidden;
   position:relative;
@@ -324,20 +335,15 @@ input:focus {
   border: 1px solid transparent;
   filter: drop-shadow(0px 0px 0px transparent);
   color: #fff;
+  position:relative;
 }
 
 .slide-enter-active, .slide-leave-active {
-  transition: transform 0.4s ease-in-out, opacity 0.4s;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-
-.slide-enter-from {
-  transform: translateX(100%);
+.slide-enter-from, .slide-leave-to {
   opacity: 0;
-}
-
-.slide-leave-to {
-  transform: translateX(-100%);
-  opacity: 0;
+  transform: translateX(20px);
 }
 
 .lamp h2 {

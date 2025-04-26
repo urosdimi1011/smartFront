@@ -22,7 +22,14 @@
                 </div>
             </transition>
           <ButtonMy @click="openWiFiSettings">Otvori WiFi podešavanja</ButtonMy>
-          <ButtonMy class="form-button">Unesite uredjaj </ButtonMy>
+          <ButtonMy class="form-button">
+             <span v-if="loadingSpinner">
+                <ProgressSpinner />
+            </span>
+            <span v-else>
+              Unesite uređaj
+            </span>
+          </ButtonMy>
             <p v-if="errorMsg">{{ errorMsg }}</p>
 
 <!--          <knob-block></knob-block>-->
@@ -41,6 +48,7 @@ import * as yup from 'yup';
 import { defineProps, ref, computed, onMounted } from 'vue';
 import { Form } from 'vee-validate';
 import FormInput from '../../components/ui/FormInput.vue';
+import ProgressSpinner from 'primevue/progressspinner';
 import { useStore } from 'vuex';
 import ButtonMy from '@/components/ui/ButtonMy.vue';
 // import KnobBlock from "@/components/layout/KnobBlock.vue";
@@ -84,12 +92,15 @@ const schema = yup.object({
 });
 const checkedCategory = ref(0);
 const check = ref(false);
+const loadingSpinner = ref(false);
 const submit = async (values) => {
     try {
         errorMsg.value = "";
+        loadingSpinner.value = true;
         let response = await store.dispatch('device/addDevice', {
             ...values, hasBrightness: Number(hasBrightness.value)
         });
+        loadingSpinner.value = false;
         tempLink.value = response.data.url;
         check.value = true;
         // window.location.href= tempLink;
@@ -98,6 +109,7 @@ const submit = async (values) => {
         errorMsg.value = poruka;
     }
 }
+
 const showAdvancedSettings = () => {
     showAdvanced.value = !showAdvanced.value;
 }
@@ -142,7 +154,7 @@ input {
 
 .form-button {
     color: black;
-    border: 1px solid black;
+    //border: 1px solid black;
     padding: 5px 10px;
     width: 100%;
     margin-top: 25px;
@@ -173,5 +185,13 @@ input {
 .slidedown-leave-to {
     overflow: hidden;
     max-height: 0;
+}
+span{
+  color:black;
+  margin:0px;
+}
+span .p-progressspinner{
+  width:35px !important;
+  height: 35px !important;
 }
 </style>

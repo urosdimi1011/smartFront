@@ -27,4 +27,7 @@ const showForms = (selectedDevice)=>{
 .button-width{
   width: 100%;
 }
+button {
+  color:black;
+}
 </style>

@@ -1,6 +1,6 @@
   <template>
     <div class="group-content">
-      <div v-if="localItems && groups && groups.length > 0" id="LightPage">
+      <div v-show="localItems && groups && groups.length > 0" id="LightPage">
         <draggable v-model="localItems" group="components" item-key="id" @end="onEnd"
                    @update:modelValue="onModelUpdate"
                    :animation="200"
@@ -85,7 +85,7 @@ const groups = ref([]);
 const toast = useToast();
 const steps = shallowRef([{ component: GroupForm, props: { previousValue: {},title:"Kreiraj novu grupu" } }
   ,{ component: DeviceFormCheckBox, props: { previousValue: {},title:"Izaberi uredjaje" } }]);
-const newDevica = shallowRef([{ component: DeviceForm, props: { previousValue: {} } }]);
+const newDevica = shallowRef([{ component: DeviceForm, props: { previousValue: {},title: "Dodaj uređaj" } }]);
 
 const localItems = ref([]);
 const condicional = ref(false);
@@ -119,7 +119,9 @@ async function fetchItems() {
       });
   }
 }
-
+// const groupsAll = computed(()=>{
+//   return store.state.group.groups != null ? store.getters['group/getAllGroups'] : null;
+// })
 const setToStepRecivedData = (data) => {
   steps.value[data.step - 1].props.previousValue = data;
 }

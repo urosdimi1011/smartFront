@@ -7,45 +7,39 @@ export default {
     }),
     getters: {
         getListOfTermostat(state){
-            return state.timer;
+            return state.termostats;
         }
     },
     mutations: {
-        setTimer: (state,data)=>{
-            state.timer = data;
+        setTermostat: (state,data)=>{
+            state.termostats = data;
         }
     },
     actions: {
         async getAll({commit}){
             try{
                 const response = await api.get('/api/termostat');
-                commit('setTimer',response.data.timers);
-                return response;
+                commit('setTermostat',response.data.termostats);
+                return response.data.termostats;
             }
             catch(error){
                 throw Error(error.message);
             }
         },
-        async addTermostat({dispatch},payload){
-            try{
-                const response = await api.post(`/api/termostat/${payload.id}`,payload);
-                await dispatch("getAll");
-                return response;
-            }
-            catch(error){
+        async addTermostat(_dispatch,payload) {
+            try {
+                return await api.post(`/api/termostat`, payload);
+            } catch (error) {
                 throw Error(error.message);
             }
         },
-        async deleteTimer({dispatch},payload){
+        async addTermostatToDevice(_dispatch,payload){
             try{
-                const response = await api.delete(`/api/timer/${payload.id}`);
-                await dispatch("getAll");
-                return response;
+                return await api.post(`/api/termostat/${payload.idTermostat}`,{idDevice:payload.id});
             }
             catch(error){
                 throw Error(error.message);
             }
         }
-     
     },
 };

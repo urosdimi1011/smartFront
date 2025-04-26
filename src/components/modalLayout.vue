@@ -21,7 +21,7 @@
               <!-- <h2>Potvrda</h2> -->
               <!-- Znaci ovo je default ukoliko se ne prosledi koja komponenta ce se ucitati, onda ce ovaj deo,
                 ali potrebno je da prosledimo ove funkcije confirm i close, a show funkcija poziva u drugom delu open metodu -->
-              <component v-if="typeof modalContent === 'object'" :is="modalContent" v-bind="props.props"></component>
+              <component v-if="typeof modalContent === 'object'" :is="modalContent" v-bind="props.props" @close="close()"></component>
               <p v-else>{{ modalContent }}</p>
               <div v-if="typeof modalContent !== 'object'" class="modal-actions">
                 <ButtonMy @click="confirm">Da</ButtonMy>
@@ -46,7 +46,6 @@
 <script setup>
 import { defineProps, defineEmits, watch, ref, computed } from 'vue';
 import ButtonMy from './ui/ButtonMy.vue';
-
 const props = defineProps({
   title: {
     type: String,
@@ -113,7 +112,11 @@ const previousStep = () => {
 const nextStep = async () => {
   if (await isValidateToNextStep()) currentStepIndex.value++;
 };
-
+const resetModal = () => {
+  currentStepIndex.value = 0;
+  localData.value = [];
+  errorMsg.value = '';
+};
 const isValidateToNextStep = async () => {
   const isValid = await validateCurrentStep();
   if (hasNext() && isValid.valid===false) {
@@ -135,11 +138,15 @@ const printErrorMessage = (message) => {
 const emit = defineEmits(['close', 'finish', 'getDatas']);
 
 const close = () => {
+  resetModal();
   emit('close');
 };
 const finishAll = async () => {
 
-  if (await isValidateToNextStep()) emit('finish');
+  if (await isValidateToNextStep()){
+    resetModal();
+    emit('finish')
+  }
 
 };
 
