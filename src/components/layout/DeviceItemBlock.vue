@@ -194,7 +194,7 @@ ul{
   background-color: #ffe6e6;
   color: #d32f2f;
   border: 2px solid #f44336;
-  animation: blink 1s infinite alternate;
+  //animation: blink 1s infinite alternate;
 }
 @keyframes blink {
   0% { opacity: 1; }
