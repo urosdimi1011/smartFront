@@ -129,10 +129,24 @@ const router = useRouter();
 // const showAnother = ()=>{
 //   stepIndex.value++;
 // }
+const isOnline = ref(navigator.onLine); // Trenutni status interneta
+const isOfflinePending = ref(false); // Flag za praćenje odlaganja offline moda
+let offlineTimeout = null; // Reference za timeout funkciju
 
-const isOnline = ref(navigator.onLine);
 const updateOnlineStatus = () => {
-  isOnline.value = navigator.onLine;
+  if (navigator.onLine) {
+    // Ako je online, resetuj status
+    isOnline.value = true;
+    isOfflinePending.value = false; // Resetuj odlaganje offline moda
+    clearTimeout(offlineTimeout); // Ukloni aktivan timeout ako postoji
+  } else {
+    // Ako je offline, započni odlaganje od 2 minuta
+    isOfflinePending.value = true;
+    offlineTimeout = setTimeout(() => {
+      isOnline.value = false; // Postavi status na offline tek nakon 2 minuta
+      isOfflinePending.value = false; // Resetuj odlaganje jer je sada stvarno offline
+    }, 60000); // 120000 ms = 2 minuta
+  }
 };
 const allCategories = computed(() => {
   return store.getters['category/getListOfCategories'];
