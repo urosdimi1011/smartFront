@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="modal-overlay" @click="closeOnOverlay">
+  <div v-if="visible" class="modal-overlay">
     <transition name="fade">
       <div class="modal-content" :style="{width : (currentStepProps ? (currentStepProps.width || width) : width)}" @click.stop>
         <header class="modal-header">
@@ -162,11 +162,11 @@ const validateCurrentStep = async () => {
   return { valid: true };
 };
 
-const closeOnOverlay = (event) => {
-  if (event.target === event.currentTarget) {
-    close();
-  }
-};
+// const closeOnOverlay = (event) => {
+//   if (event.target === event.currentTarget) {
+//     close();
+//   }
+// };
 
 watch(() => props.visible, (newVal) => {
   if (!newVal) close();
