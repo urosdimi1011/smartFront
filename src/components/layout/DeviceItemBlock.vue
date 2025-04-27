@@ -90,7 +90,8 @@ async function toggleActive() {
     try {
         const data = {
             status: !active.value,
-            id: props.data.board
+            id: props.data.board,
+            pin : props.data.pin
         };
         await store.dispatch('device/changeStatusOfDevice', data);
         // active.value = props.data.status;

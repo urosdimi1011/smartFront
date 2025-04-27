@@ -45,9 +45,9 @@ export default {
                 throw Error(error.message);
             }
         },
-        async changeStatusOfDevice({ dispatch }, { id, status }) {
+        async changeStatusOfDevice({ dispatch }, { id, status,pin }) {
             try {
-                const response = await api.get(`/api/device/status/${id}?status=${Number(status)}`);
+                const response = await api.get(`/api/device/status/${id}?status=${Number(status)}&pin=${pin}`);
                 // Da li ovo moze drugacije da se resi????
                 await dispatch("group/getAllGroup", null, { root: true });
                 await dispatch("getAllDevices");
