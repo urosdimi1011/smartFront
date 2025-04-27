@@ -88,6 +88,7 @@ const titleOfModal = ref("");
 async function toggleActive() {
     // Ovde treba da se prosledi dispathc za promenu statusa device!
     try {
+      //Promena
         const data = {
             status: !active.value,
             id: props.data.board,
