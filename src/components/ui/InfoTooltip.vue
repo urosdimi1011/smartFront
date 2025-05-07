@@ -15,11 +15,11 @@
 </template>
 <script setup>
 import {ref, defineProps, onMounted, onUnmounted, computed,useSlots,defineOptions,defineEmits} from 'vue'
-const show = ref(true);
 defineOptions({
   inheritAttrs: false
 });
 const slots = useSlots();
+const show = ref(slots.default ? true : false);
 defineProps({
   text: String,
 })

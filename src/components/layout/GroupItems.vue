@@ -26,7 +26,7 @@
                 <i class="fa-solid fa-arrow-down"></i>
             </div>
             <transition name="slidedown" mode="out-in">
-                <div v-show="showMenuProp || automaticOpen" class="slide-menu main">
+                <div v-if="showMenuProp || automaticOpen" class="slide-menu main">
                     <template v-if="devices && devices.length > 0">
                         <item-block v-for="item in devices" :key="item.id" :data="item">
                         </item-block>
@@ -118,7 +118,7 @@ const props = defineProps({
 const devicesProba = ref(props.devices);
 watch(()=>props.devices,(newValue)=>{
     devicesProba.value = newValue;
-})
+},{ deep: false })
 
 // const checkRangeOfDevice = ()=>{
 //   return props.devices.some(x=>x.is_out_of_range);
@@ -437,21 +437,22 @@ button {
     color: #fff;
 }
 
-.slidedown-enter-active,
-.slidedown-leave-active {
-    transition: max-height 0.5s ease-in-out;
+.slidedown-enter-active, .slidedown-leave-active {
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 
-.slidedown-enter-to,
-.slidedown-leave-from {
-    overflow: hidden;
-    max-height: 1000px;
+.slidedown-enter-from, .slidedown-leave-to {
+  opacity: 0;
+  max-height: 0;
 }
 
-.slidedown-enter-from,
-.slidedown-leave-to {
-    overflow: hidden;
-    max-height: 0;
+.slidedown-enter-to, .slidedown-leave-from {
+  opacity: 1;
+  max-height: 500px; /* Postavi visinu */
+}
+
+.slide-menu {
+  will-change: opacity, max-height;
 }
 .py-5{
   padding: 10px ;
