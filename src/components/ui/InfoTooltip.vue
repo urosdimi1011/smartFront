@@ -1,26 +1,40 @@
 <template>
-  <div class="info-wrapper" ref="wrapperRef" @click.stop="toggleTooltip">
-    <span class="info-icon"><i class="fas fa-info-circle"></i></span>
-    <div v-if="show" class="tooltip" v-html="text">
-    </div>
+  <div ref="wrapperRef"> <!-- Dodaj ref oko celog sadržaja -->
+    <template v-if="hasSlot">
+      <div v-if="show" class="tooltip" v-bind="$attrs">
+        <slot></slot>
+      </div>
+    </template>
+    <template v-else>
+      <div class="info-wrapper" @click.stop="toggleTooltip">
+        <span class="info-icon"><i class="fas fa-info-circle"></i></span>
+        <div v-if="show" class="tooltip" v-html="text"></div>
+      </div>
+    </template>
   </div>
 </template>
 <script setup>
-import { ref,defineProps,onMounted,onUnmounted } from 'vue'
+import {ref, defineProps, onMounted, onUnmounted, computed,useSlots,defineOptions,defineEmits} from 'vue'
+const show = ref(true);
+defineOptions({
+  inheritAttrs: false
+});
+const slots = useSlots();
 defineProps({
-  text: String
+  text: String,
 })
-
-const show = ref(false);
+const hasSlot = computed(() => !!slots.default);
+const emit = defineEmits(['close']);
 const wrapperRef = ref(null);
 function toggleTooltip() {
   show.value = !show.value
 }
-const handleClickOutside = (event)=>{
+const handleClickOutside = (event) => {
   if (wrapperRef.value && !wrapperRef.value.contains(event.target)) {
-    show.value = false
+    show.value = false;
+    emit('close',show.value);
   }
-}
+};
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
@@ -67,4 +81,16 @@ ul {
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   text-align:left;
 }
+.customToolTip{
+  top: 5px;
+  right: 0px !important;
+  transform: none !important;
+  width:50% !important;
+  left: unset !important;
+}
+.customToolTip > *{
+  width:100%;
+  text-wrap: initial;
+}
+
 </style>

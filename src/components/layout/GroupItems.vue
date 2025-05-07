@@ -9,12 +9,14 @@
                   <FormInput class="form-input" id="groupName" name="groupName" v-model="newGroupName"/>
                   <button-my @click="changeGroupName()">Izmeni</button-my>
                 </div>
+              <info-tooltip class="customToolTip" v-if="doesDeviceOutOfRange && showTooltip" @close="changeDisplayOfTooltip">
+                <p>Tretnutno ne mozežete da upalite ili ugasite uređaje, verovatno su neki ili svi van mreže</p>
+              </info-tooltip>
 
-                <ButtonMy  @click.stop="turnOnAll($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
+                <ButtonMy  @click.stop="!doesDeviceOutOfRange ? turnOnAll($event) : showTooltip = !showTooltip" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
                   <PhCheck v-if="devicesAllTurn" :size="32" />
-                  <PhX v-else :size="32" />
+                  <PhPower v-else :size="32" />
                 </ButtonMy>
-
             </div>
             <div class="line-block">
                 <hr />
@@ -24,7 +26,7 @@
                 <i class="fa-solid fa-arrow-down"></i>
             </div>
             <transition name="slidedown" mode="out-in">
-                <div v-if="showMenuProp || automaticOpen" class="slide-menu main">
+                <div v-show="showMenuProp || automaticOpen" class="slide-menu main">
                     <template v-if="devices && devices.length > 0">
                         <item-block v-for="item in devices" :key="item.id" :data="item">
                         </item-block>
@@ -70,7 +72,8 @@ import { useToast } from 'vue-toastification';
 import ButtonMy from "@/components/ui/ButtonMy.vue";
 import FormInput from "@/components/ui/FormInput.vue";
 import ProgressSpinner from 'primevue/progressspinner';
-import {PhCheck, PhPencil, PhXCircle,PhX} from "@phosphor-icons/vue";
+import {PhCheck, PhPencil, PhXCircle, PhPower} from "@phosphor-icons/vue";
+import InfoTooltip from "@/components/ui/InfoTooltip.vue";
 
 // import device from '@/store/modules/device';
 
@@ -85,6 +88,7 @@ const textOnButton = ref(['Dodaj novi uredjaj','Dodaj vec postojeci uredjaj']);
 const showModals = ref(['newDevice','addDevice']);
 const toast = useToast();
 const { isOpen, show, close, modalContent, confirm } = showModal();
+const showTooltip = ref(false);
 const props = defineProps({
     devices: {
         type: Array,
@@ -123,6 +127,14 @@ const closeModal = () => {
     activeForms.value = "";
     close();
 }
+
+const changeDisplayOfTooltip = (show)=>{
+  showTooltip.value = show;
+}
+
+const doesDeviceOutOfRange = computed(()=>{
+  return props?.devices?.some((x)=>x.is_out_of_range);
+});
 const devicesAllTurn = computed(()=>{
     if(devicesProba.value){
         return devicesProba.value.length && devicesProba.value.every(x=>x.status);
@@ -215,6 +227,8 @@ const changeGroupNameFunc = ()=>{
 const newGroupName = ref(props.groupName);
 </script>
 <style scoped>
+
+
 .changeGroupNameBlock{
   display:flex;
   gap:20px;
@@ -284,7 +298,6 @@ const newGroupName = ref(props.groupName);
 }
 
 .down-group-items {
-    height: 40px;
     cursor: pointer;
     text-align: center;
 }
@@ -372,6 +385,7 @@ input.moje:checked~.arrowPravi::after {
 }
 .activeAll {
     margin-left: auto;
+    margin-right: 10px;
     border-color: white;
     width: 3vw;
     height: 5vh;
@@ -394,7 +408,6 @@ input.moje:checked~.arrowPravi::after {
 .arrow-up {
     transform: rotate(180deg);
 }
-
 .header-group-content {
     color: #fff;
     font-size: 30px;
@@ -410,7 +423,6 @@ input.moje:checked~.arrowPravi::after {
     margin-top: 50px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    padding: 10px 10px 10px 10px;
     transition: all 300ms;
     position: relative;
 }
@@ -444,4 +456,8 @@ button {
 .py-5{
   padding: 10px ;
 }
+.slide-menu{
+  padding-bottom: 3vh;
+}
+
 </style>

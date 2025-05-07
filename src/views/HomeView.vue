@@ -20,7 +20,7 @@
     <div v-if="loadingSpiner" class="spinner-container">
       <ProgressSpinner/>
     </div>
-      <group-items :doesChangeGroupNameProps="false" :devices="devicesAll" groupName="Lista svih uredjaja" automaticOpen="true" :showButtonOfTurnAll="false" :addDeviceOptions="false"></group-items>
+      <group-items :doesChangeGroupNameProps="false" :devices="devicesAll" groupName="Lista svih uređaja" automaticOpen="true" :showButtonOfTurnAll="false" :addDeviceOptions="false"></group-items>
     <div class="add-group">
         <div @click="showModalDevice(0)" class="lamp background-block">
           <a href="#"><i class="fa-solid fa-plus"></i></a>
@@ -173,7 +173,7 @@ const closeAll = () => {
   -webkit-user-select: none; /* Blokira selekciju na iOS-u */
   -webkit-touch-callout: none; /* Sprečava dug pritisak da otvori meni */
 }
-group-items {
+.group-items {
   position: relative;
 }
 .draggable-item:active {

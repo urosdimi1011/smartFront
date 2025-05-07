@@ -197,7 +197,8 @@ ul{
   color: #d32f2f;
   border: 2px solid #f44336;
   backdrop-filter: blur(20px);
-  //animation: blink 1s infinite alternate;
+  will-change: backdrop-filter;
+//animation: blink 1s infinite alternate;
 }
 @keyframes blink {
   0% { opacity: 1; }

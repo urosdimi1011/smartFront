@@ -319,6 +319,7 @@ input:focus {
   color: #fff;
   opacity: 1;
   filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff);
+  will-change: filter;
 }
 
 .spinner-container {
@@ -340,11 +341,13 @@ input:focus {
 .lamp i {
   transition: all 300ms;
   filter: drop-shadow(0px 0px 0px transparent);
+  will-change: filter;
 }
 
 .lamp.active i:not(:last-child),
 .lamp.active svg {
   filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff) drop-shadow(0 0 30px #fff) drop-shadow(0 0 80px #fff);
+  will-change: filter;
 }
 
 .lamp.active i:not(:last-child)::before {
@@ -361,6 +364,7 @@ input:focus {
   transition: all 300ms;
   border: 1px solid transparent;
   filter: drop-shadow(0px 0px 0px transparent);
+  will-change: filter;
   color: #fff;
   position:relative;
 }
@@ -730,11 +734,9 @@ button:active {
 }
 
 .buttons label:hover {
-
   opacity: 1;
-
   filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff);
-
+  will-change: filter;
 }
 
 .tabs input:nth-child(1):checked~.buttons label:nth-child(1),
@@ -746,13 +748,10 @@ button:active {
 .tabs input:nth-child(4):checked~.buttons label:nth-child(4),
 
 .tabs input:nth-child(5):checked~.buttons label:nth-child(5) {
-
   color: #fff;
-
   opacity: 1;
-
   filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff);
-
+  will-change: filter;
 }
 
 .underline {
@@ -772,47 +771,29 @@ button:active {
 }
 
 .underline::before {
-
   content: '';
-
   position: absolute;
-
   left: 50%;
-
   transform: translateX(-50%);
-
   width: 40%;
-
   height: 100%;
-
   background: #fff;
-
   border-radius: 4px;
-
   filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff) drop-shadow(0 0 30px #fff) drop-shadow(0 0 50px #fff);
-
+  will-change: filter;
 }
 
 .underline::after {
-
   content: '';
-
   position: absolute;
-
   left: 50%;
-
   transform: translateX(-50%);
-
   width: 40%;
-
   height: 100%;
-
   background: #fff;
-
   border-radius: 4px;
-
   filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff);
-
+  will-change: filter;
 }
 
 .active-tab:nth-of-type(1) ~ .underline{
@@ -988,7 +969,7 @@ button:active {
     height: 20px !important;
   }
   .changeGroupNameBlock button{
-    font-size: 12px;
+    font-size: 10px !important;
   }
   .changeGroupNameBlock input{
     padding: 7px 10px;
@@ -1008,8 +989,30 @@ button:active {
 
 @media only screen and (max-width: 400px) {
   .activeAll{
-    width: 11vw !important;
-    height: 6vh !important;
+    width: 7vw !important;
+    height: 4vh !important;
+    border-radius: 0.3em !important;
+    box-shadow: none !important;
+    border: 1px solid #fff !important;
+    position :absolute !important;
+    top:10px !important;
+    right:10px !important;
+    padding: 2px 3px !important;
+    margin-right: 0px !important;
+  }
+  .customToolTip{
+    top:-45px !important;
+  }
+  .activeAll button{
+    padding: 10px 8px !important;
+  }
+  .activeAll svg{
+    width: 100% !important;
+    height:100% !important;
+  }
+  .content-conf{
+    flex-wrap: wrap;
+    justify-content: center !important;
   }
   .register-form,
   .login-form {
@@ -1072,15 +1075,9 @@ button:active {
   .login-background{
     padding-top: 60px !important;
   }
-.down-group-items{
-  height: 30px !important;
-}
   .down-group-items i{
     padding: 8px 0px !important;
     font-size: 18px !important;
-  }
-  .slide-menu .lamp{
-    width: 80% !important;
   }
   .underline::after {
     width: 50%;
