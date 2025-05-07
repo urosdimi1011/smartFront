@@ -63,11 +63,11 @@
 
     <div class="block-fixed">
       <div @click="showTimerModal()" class="lamp background-block">
-        <i class="fa-regular fa-clock"></i>
+        <PhAlarm :size="32" />
         <p>Tajmer</p>
       </div>
       <div @click="showUserModal()" class="lamp background-block">
-        <i class="fa-solid fa-user"></i>
+        <PhUser :size="32" />
         <p>Korisnicki profil</p>
       </div>
     </div>
@@ -115,6 +115,7 @@ import Skeleton from 'primevue/skeleton';
 const { isOpen, show, close } = showModal();
 import store from '@/store';
 import UserView from './views/UserView.vue';
+import {PhAlarm, PhUser} from "@phosphor-icons/vue";
 
 
 const components = shallowRef([
@@ -225,7 +226,7 @@ const prevPage = () => {
   margin: 0px;
   padding: 0px;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 a {
@@ -264,6 +265,15 @@ input:focus {
   width: 100%;
   top: 0;
   z-index: 2;
+  background-color: transparent;
+}
+.tabs .buttons{
+  background-color: #00293E !important;
+  border-radius: 0px 0px 20px 20px;
+}
+.tabs.background-block{
+  border:none;
+  background-color: transparent;
 }
 .close-button:before, .close-button:after {
   position: absolute;
@@ -276,7 +286,10 @@ input:focus {
 }
 .close-button:after { transform: rotate(-45deg); }
 
-
+.activeAll{
+  width: 4vw;
+  height: 4vh;
+}
 .skeleton-box {
   width: 25%;
   height: 20px;
@@ -382,7 +395,7 @@ input:focus {
 }
 
 .login-background {
-  min-height: 220vh;
+  min-height: 100vh;
   background-color: #00293E;
   padding-top: 137px;
 }
@@ -437,11 +450,7 @@ input:focus {
 .background-block {
   background-color: rgba(255, 255, 255, 0.13);
   border: 2px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  //-webkit-filter: blur(10px);
   box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
-  /* padding: 20px 10px 20px 10px !; */
 }
 
 .login-form,
@@ -863,7 +872,9 @@ button:active {
 .container {
   position: relative;
   width: 100%;
+  height: 100%;
   max-height: max-content;
+  padding-bottom: 130px;
 }
 
 .page.active {
@@ -890,10 +901,18 @@ button:active {
   .lamp{
     width: 40%;
   }
+  .activeAll{
+    width: 4vw !important;
+    height: 6vh !important;
+  }
 }
 @media only screen and (max-width: 900px) {
   .header-group{
     font-size: 25px;
+  }
+  .activeAll{
+    width: 6vw !important;
+    height: 6vh !important;
   }
 }
 @media only screen and (max-width: 760px) {
@@ -911,8 +930,32 @@ button:active {
     height: 470px;
     left: 53%;
   }
+  .remove-group{
+    font-size: 20px !important;
+  }
+  .activeAll{
+    width: 4vw !important;
+    height: 4vh !important;
+  }
+  .activeAll svg{
+    width: 22px !important;
+    height: 22px !important;
+  }
+  .tooltip{
+    transform: translateX(-79%) !important;
+    font-size: 12px !important;
+  }
+  .header-group-content{
+    min-height:70px !important;
+  }
   .group-content{
     width: 95%;
+  }
+  .modal-content{
+    width: auto !important;
+  }
+  .modal-header{
+    font-size: 13px !important;
   }
   .add-group p{
     font-size: 15px !important;
@@ -927,24 +970,47 @@ button:active {
     font-size: 15px;
     width: 60%;
   }
+  .header-group i{
+    font-size: 15px !important;
+  }
   .activeAll{
-    width: 15% !important;
+    width: 12% !important;
+  }
+  input.moje:checked~.arrowPravi::after{
+    transform:translateY(0%) !important;
+  }
+  .changeGroupNameBlock{
+    margin-right: 7vw;
+    gap: 10px !important;
+  }
+  .header-group-pencil svg{
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .changeGroupNameBlock button{
+    font-size: 12px;
+  }
+  .changeGroupNameBlock input{
+    padding: 7px 10px;
   }
   .arrowPravi{
     width: 100% !important;
     height: 100% !important;
   }
   .login-background{
-    height: 300vh;
+    //height: 300vh;
   }
   .container{
-    height: 250vh;
-    max-height: 400vh;
+    //height: 250vh;
+    //max-height: 400vh;
   }
 }
 
 @media only screen and (max-width: 400px) {
-
+  .activeAll{
+    width: 11vw !important;
+    height: 6vh !important;
+  }
   .register-form,
   .login-form {
     width: 323px;
@@ -999,11 +1065,23 @@ button:active {
     width: 17%;
   }
   .underline::before {
-    width: 53%;
+    width: 55%;
     left: 0;
-  transform : translateX(0%);
+    transform : translateX(0%);
   }
-
+  .login-background{
+    padding-top: 60px !important;
+  }
+.down-group-items{
+  height: 30px !important;
+}
+  .down-group-items i{
+    padding: 8px 0px !important;
+    font-size: 18px !important;
+  }
+  .slide-menu .lamp{
+    width: 80% !important;
+  }
   .underline::after {
     width: 50%;
     right:0;
@@ -1035,6 +1113,13 @@ button:active {
   width: 100%;
   position: fixed;
   bottom: 20px;
+}
+
+.block-fixed .lamp{
+  background-color: #00293E;
+  font-size: 12px;
+  width: 40%;
+  padding: 10px 0px;
 }
 
 .smooth-fade-enter-active,
@@ -1071,7 +1156,5 @@ button:active {
   font-size: 30px;
   color: white;
 }
-body,html{
-  overflow-x:hidden ;
-}
+
 </style>

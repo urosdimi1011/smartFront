@@ -20,7 +20,7 @@
     <div v-if="loadingSpiner" class="spinner-container">
       <ProgressSpinner/>
     </div>
-
+      <group-items :doesChangeGroupNameProps="false" :devices="devicesAll" groupName="Lista svih uredjaja" automaticOpen="true" :showButtonOfTurnAll="false" :addDeviceOptions="false"></group-items>
     <div class="add-group">
         <div @click="showModalDevice(0)" class="lamp background-block">
           <a href="#"><i class="fa-solid fa-plus"></i></a>
@@ -33,7 +33,6 @@
           <p>Kreiraj novi uredjaj</p>
         </div>
       </div>
-      <group-items :doesChangeGroupNameProps="false" :devices="devicesAll" groupName="Lista svih uredjaja" automaticOpen="true" :showButtonOfTurnAll="false" :addDeviceOptions="false"></group-items>
       <Teleport to="body">
         <modal-layout :visible="isOpen" @close="closeAll()" :steps="condicional ? newDevica : steps"
           @getDatas="setToStepRecivedData" @finish="sendAllData">

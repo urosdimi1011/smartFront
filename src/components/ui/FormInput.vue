@@ -1,6 +1,6 @@
   <template>
       <div class="form-group">
-          <label :for="id">{{ label }}</label>
+          <label v-if="label" :for="id">{{ label }}</label>
           <Field v-if="type === 'text' || type === 'password' || type === 'email' || type==='hidden'" :placeholder="placeholder" :type="type" :id="id" :name="name"
               :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
 

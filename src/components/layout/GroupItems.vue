@@ -3,16 +3,17 @@
             :class="{ scale: isClass || automaticOpen, glowEffect: devicesAllTurn }">
             <div class="header-group-content">
                 <button v-if="showButtonOfTurnAll"  @click="confirmDelete()"  class="remove-group close-button">X</button>
-                <h3 v-if="!doesChangeGroupName" class="header-group">{{ groupName }} <span v-if="doesChangeGroupNameProps" @click="changeGroupNameFunc()"><i class="fa-solid fa-pencil"></i></span></h3>
+                <h3 v-if="!doesChangeGroupName" class="header-group header-group-pencil">{{ groupName }} <span v-if="doesChangeGroupNameProps" @click="changeGroupNameFunc()"><PhPencil :size="32" /></span></h3>
                 <div v-else class="changeGroupNameBlock">
-                  <i @click="changeGroupNameFunc()" class="fa fa-window-close"></i>
+                  <PhXCircle @click="changeGroupNameFunc()" :size="32" />
                   <FormInput class="form-input" id="groupName" name="groupName" v-model="newGroupName"/>
                   <button-my @click="changeGroupName()">Izmeni</button-my>
                 </div>
-                
-                <ButtonMy  @click.stop="turnOnAll($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll"><input :id="'activeAllItems' + id" :checked="devicesAllTurn" disabled class="moje2" :class="{moje : devicesAllTurn}"
-                        type="checkbox" /><label :for="'activeAllItems' + id" class="arrowPravi"
-                        ></label></ButtonMy>
+
+                <ButtonMy  @click.stop="turnOnAll($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
+                  <PhCheck v-if="devicesAllTurn" :size="32" />
+                  <PhX v-else :size="32" />
+                </ButtonMy>
 
             </div>
             <div class="line-block">
@@ -35,7 +36,7 @@
                     <ProgressSpinner/>
                   </template>
                     <div v-if="addDeviceOptions" class="w-100 d-flex-center">
-                        <div class="lamp background-block" @click="show()">
+                        <div class="lamp background-block py-5" @click="show()">
                             <a href="#"><i class="fa-solid fa-plus"></i></a>
                         </div>
                     </div>
@@ -69,6 +70,7 @@ import { useToast } from 'vue-toastification';
 import ButtonMy from "@/components/ui/ButtonMy.vue";
 import FormInput from "@/components/ui/FormInput.vue";
 import ProgressSpinner from 'primevue/progressspinner';
+import {PhCheck, PhPencil, PhXCircle,PhX} from "@phosphor-icons/vue";
 
 // import device from '@/store/modules/device';
 
@@ -299,7 +301,7 @@ const newGroupName = ref(props.groupName);
 }
 
 .header-group {
-    width: 30%;
+    width: 50%;
     display: flex;
     align-items:center;
     gap:25px;
@@ -350,7 +352,9 @@ input.moje:checked~.arrowPravi::after {
     content: '\f00c';
     font-family: "Font Awesome 6 Free";
     vertical-align: middle;
+    display:block;
     visibility: visible;
+    transform:translateY(60%);
 }
 
 .arrowPravi::after {
@@ -362,23 +366,21 @@ input.moje:checked~.arrowPravi::after {
     display: inline-block;
     width: 40px;
     background-color: transparent;
-    border: 2px solid #fff;
+    //border: 2px solid #fff;
     border-radius: 2px;
     height: 40px;
 }
-
-input.moje:checked~.arrowPravi {
-    outline: max(3px, 0.15em) solid white;
-    outline-offset: max(3px, 0.15em);
-}
-
-
 .activeAll {
     margin-left: auto;
     border-color: white;
+    width: 3vw;
+    height: 5vh;
     /* margin-left: 10px; */
     padding: 10px;
-
+}
+.activeAll svg{
+  width: 22px;
+  height:22px
 }
 
 .arrow {
@@ -438,5 +440,8 @@ button {
 .slidedown-leave-to {
     overflow: hidden;
     max-height: 0;
+}
+.py-5{
+  padding: 10px ;
 }
 </style>
