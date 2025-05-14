@@ -1,6 +1,4 @@
 <template>
-<!--  ,offline : data.is_out_of_range-->
-<!--  !data.is_out_of_range ? toggleActive() : null-->
     <div @click.stop="!data.is_out_of_range ? toggleActive() : null" :data-id="data.id" class="lamp background-block" :class="{active: active,offline : data.is_out_of_range }">
       <info-tooltip :text="printTextFotTooltip()"></info-tooltip>
       <div class="content-up">
@@ -18,7 +16,6 @@
                     <p>{{ data.name }}</p>
                 </div>
                 <div @click.stop v-if="!showInputField" class="form-change-input">
-                    <!-- <span @click.stop="changeNameOfInput()"><i class="fa-solid fa-xmark"></i></span> -->
                     <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
                     <ButtonMy class="color-button" @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
                 </div>
@@ -47,22 +44,18 @@
                 </div>
             </transition>
         </div>
-
         <Teleport to="body">
             <modal-layout :title="titleOfModal" :props="defineMyProps" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
             </modal-layout>
-<!--            <modal-layout title="Promeni lozinku" :modalContent="modalContent"  :confirm="confirm" :visible="isOpen" :close="close()">-->
-<!--            </modal-layout>-->
         </Teleport>
-
-
     </div>
 </template>
 <script setup>
-import { ref, defineProps, onUpdated } from 'vue';
+import {ref, defineProps, defineOptions,computed} from 'vue';
 import modalLayout from '../modalLayout.vue';
-import { showModal } from '../../composables/modal'
+import { showModal } from '../../composables/modal';
 import { PhPlugs, PhPlugsConnected,PhWifiX } from "@phosphor-icons/vue";
+defineOptions({ memo: true });
 const { isOpen, show, close, confirm, modalContent } = showModal();
 // Ovo je globalan objekat sa podacima
 import store from '@/store';
@@ -76,10 +69,9 @@ const props = defineProps({
         required: true
     }
 });
-onUpdated(() => {
-    active.value = props.data.status;
-});
-const active = ref(props.data.status);
+
+const active = computed(() => props.data.status);
+
 const showInputField = ref(true);
 const doShowAdcConf = ref(false);
 const defineMyProps = ref([]);
@@ -158,9 +150,8 @@ async function changeName() {
         });
     }
 }
-
 </script>
-<style>
+<style scoped>
 .color-button{
   background-color: #87c33e !important;
 }
@@ -196,22 +187,10 @@ ul{
   background-color: #ffe6e6;
   color: #d32f2f;
   border: 2px solid #f44336;
-  backdrop-filter: blur(20px);
-  will-change: backdrop-filter;
-//animation: blink 1s infinite alternate;
 }
-@keyframes blink {
-  0% { opacity: 1; }
-  100% { opacity: 0.5; }
-}
-/* button{
-    margin-top: 20px !important;
-} */
-
 .form-change-input span i {
     font-size: 15px;
 }
-
 .name-block {
     display: flex;
     justify-content: center;

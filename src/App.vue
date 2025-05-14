@@ -74,27 +74,11 @@
 
 
     <modal-layout v-model:currentStepIndexProps="stepIndex" :steps="components" :visible="isOpen" @close="close()">
-      <!-- <template #body>
-        <TimerView @close="close()" />
-      </template> -->
-      <!-- {{ a.currentStepIndex }} -->
       <template v-if="components.length > 1" #steps="{ nextStep, hasNext, previousStep }">
         <ButtonMy v-if="hasNext()" @click="nextStep()" class="form-button">Pogledaj listu dodatih tajmera </ButtonMy>
         <ButtonMy v-else @click="previousStep()" class="form-button">Vrati se na dodavanje tajmera </ButtonMy>
       </template>
-      <!-- <template></template> -->
     </modal-layout>
-    <!-- <modal-layout :visible="isOpen" @close="close()">
-      <template #header>
-        <h2>Informacije o korisniku</h2>
-      </template>
-      <template #body>
-
-      </template>
-    </modal-layout> -->
-
-
-
 
   </div>
   <div v-else>
@@ -116,6 +100,7 @@ const { isOpen, show, close } = showModal();
 import store from '@/store';
 import UserView from './views/UserView.vue';
 import {PhAlarm, PhUser} from "@phosphor-icons/vue";
+import MobileTimerView from "@/components/ui/MobileTimerView.vue";
 
 
 const components = shallowRef([
@@ -168,7 +153,16 @@ function isActive(path) {
   return currentPath.startsWith(targetPath);
 }
 function showTimerModal() {
-  components.value = [{ component: TimerView, props: {title : "Dodaj tajmer"} }, { component: TimerTable, props: { width: "1300px",title:'Lista tajmera' } }];
+  const isMobile = window.innerWidth <= 768;
+  if(isMobile){
+    components.value = [
+      { component: TimerView, props: {title : "Dodaj tajmer"} },
+      { component: MobileTimerView, props: {title: "Lista tajmera"}},
+    ]
+  }
+  else{
+    components.value = [{ component: TimerView, props: {title : "Dodaj tajmer"} }, { component: TimerTable, props: { width: "1300px",title:'Lista tajmera' } }];
+  }
   show();
 }
 
@@ -363,8 +357,8 @@ input:focus {
   cursor: pointer;
   transition: all 300ms;
   border: 1px solid transparent;
-  filter: drop-shadow(0px 0px 0px transparent);
-  will-change: filter;
+  //filter: drop-shadow(0px 0px 0px transparent);
+  //will-change: filter;
   color: #fff;
   position:relative;
 }
@@ -974,6 +968,9 @@ button:active {
   .changeGroupNameBlock input{
     padding: 7px 10px;
   }
+  input{
+    font-size:16px !important;
+  }
   .arrowPravi{
     width: 100% !important;
     height: 100% !important;
@@ -1061,7 +1058,12 @@ button:active {
     width: 45%;
     overflow: hidden;
   }
-
+  .groups-items p,.form-group label{
+      font-size:16px !important;
+  }
+  .temperature-block .lamp{
+    width: 80%;
+  }
 
 
   .underline {
@@ -1097,11 +1099,12 @@ button:active {
   .active-tab:nth-of-type(4) ~ .underline{
     left:76.9%;
   }
-
-
-
-
-
+  .user-body li{
+    font-size: 16px !important;
+  }
+  button{
+    font-size:15px !important;
+  }
 }
 
 .block-fixed {

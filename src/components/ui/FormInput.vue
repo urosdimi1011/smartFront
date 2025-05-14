@@ -3,11 +3,8 @@
           <label v-if="label" :for="id">{{ label }}</label>
           <Field v-if="type === 'text' || type === 'password' || type === 'email' || type==='hidden'" :placeholder="placeholder" :type="type" :id="id" :name="name"
               :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
-
           <MultiSelect v-if="multiSelect && type === 'groupCheckBox'" v-model="selected" :options="options"
               option-value="value" option-label="label" :placeholder="label" class="w-full md:w-20rem" />
-
-
           <div v-if="type === 'checkbox' && options && options.length" class="w">
               <div v-for="option of options" :key="option.id">
                   <label :for="`${option.name.split(' ').join('_')}${option.id}`">{{ option.name }}</label>
@@ -92,21 +89,16 @@
           emit('update:modelValue', selected.value);
       }
   })
-
   const proba = computed({
       get: () => props.modelValue,
       set: (newValue) => {
           emit('update:modelValue', newValue)
       }
   });
-
-
   const selected = computed({
       get: () => props.modelValue,
       set: (newValue) => emit('update:modelValue', newValue)
   });
-
-
   const emit = defineEmits(['update:modelValue']);
   </script>
   <style>
@@ -115,28 +107,24 @@
       font-size: 20px;
       margin-bottom: 10px;
   }
-
   .w label {
       display: inline-block;
       margin-bottom: 0px;
       margin-right: 20px;
   }
-
   .form-group {
       margin: 20px 0px;
   }
-
   input {
       width: 100%;
-      border-radius: 10px;
+      border-radius: 8px;
       outline: none;
       padding: 10px 10px;
+      font-size:16px !important;
   }
-
   .w {
       width: 100%;
   }
-
   .form-group:has(>.w) {
       flex-direction: column;
       align-items: flex-start !important;
@@ -149,5 +137,16 @@
   }
   .d-flex{
     display: flex;
+  }
+  .moj-tajmer-input input{
+    border:1px solid rgba(0,0,0,0.25) !important;
+    padding: 8px 10px;
+    border-radius:8px !important;
+  }
+  .moj-tajmer-input input::placeholder{
+    color:rgba(0,0,0,0.6);
+  }
+  .flex .p-multiselect{
+    width: 50%;
   }
   </style>

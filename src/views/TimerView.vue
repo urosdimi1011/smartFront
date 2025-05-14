@@ -3,38 +3,40 @@
         <div class="add-timer-content">
             <Form @submit="submit" :validation-schema="schema">
                 <div class="groups-items">
-                    <p> Nazovi tajmer</p>
-                    <!-- Opcion naziv tajmera -->
-                    <FormInput placeholder="Nije obavezno" id="name" name="name" />
+                    <p>Nazovi tajmer</p>
+                    <FormInput id="name" name="name" class="moj-tajmer-input"/>
                 </div>
                 <div class="groups-items">
                     <p>Dodaj vreme</p>
                     <DatePicker name="date" class="p-datepicker-time-picker-moj" v-model="templatedisplay" timeOnly />
                 </div>
-
                 <div class="groups-items">
                     <p>Uredjaj treba da se:</p>
-                    <ToggleButton name="turn" v-model="turn" size="large" onLabel="Ukljuci" offLabel="Iskljuci" />
-                </div>
-                <FormInput type="groupCheckBox" v-model="selectedDays" id="days" :options="days" multiSelect
-                    label="Izaberite dane" name="days" />
+                  <ToggleSwitch
+                      v-model="turn" name="turn">
+                    <template #handle="{ checked }">
 
-                <FormInput type="groupCheckBox" v-model="devicesSelected" id="devices" :options="devicesDisplay"
-                    multiSelect label="Izaberite uredjaje" name="devices" />
-                <ButtonMy class="form-button">Dodaj tajmer </ButtonMy>
+                      <i :class="['!text-xs pi', { 'pi-check': checked, 'pi-times': !checked }]" />
+                    </template>
+                  </ToggleSwitch>
+<!--                    <ToggleButton name="turn" v-model="turn" size="large" onLabel="Ukljuci" offLabel="Iskljuci" />-->
+                </div>
+                    <FormInput class="flex" type="groupCheckBox" v-model="selectedDays" id="days" :options="days" multiSelect
+                        label="Izaberite dane" name="days" />
+
+                    <FormInput class="flex" type="groupCheckBox" v-model="devicesSelected" id="devices" :options="devicesDisplay"
+                        multiSelect label="Izaberite uredjaje" name="devices" />
+                    <ButtonMy class="form-button">Dodaj tajmer </ButtonMy>
             </Form>
         </div>
     </div>
 </template>
 <script setup>
 import * as yup from 'yup';
-// import TimerTable from '@/components/layout/TimerTable.vue';
-// import ModalLayout from '@/components/modalLayout.vue';
 import FormInput from '@/components/ui/FormInput.vue';
 import DatePicker from 'primevue/datepicker';
-import ToggleButton from 'primevue/togglebutton';
+import ToggleSwitch from 'primevue/toggleswitch';
 import { computed, onMounted, ref,defineEmits } from 'vue';
-// import { showModal } from '@/composables/modal';
 import { Form } from 'vee-validate';
 import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
@@ -111,23 +113,33 @@ const submit = async (values) => {
 
 </script>
 <style scoped>
+
 .p-datepicker-panel {
     background-color: #fff !important;
 }
-
-.groups-items p {
-    width: 70%;
+.groups-items{
+  //align-items: stretch !important;
+  min-height: 8vh;
 }
-
+.groups-items p{
+    width: 70%;
+    font-size:20px;
+}
 .day-checkbox {
     margin-bottom: 10px;
 }
-
 label {
     margin-left: 5px;
 }
-
 button {
     margin-top: 20px !important;
+}
+.w-50{
+  width:50%;
+}
+.flex{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
 }
 </style>

@@ -2,7 +2,13 @@
         <div class="group-items background-block"
             :class="{ scale: isClass || automaticOpen, glowEffect: devicesAllTurn }">
             <div class="header-group-content">
+              <div class="remove-group-block">
                 <button v-if="showButtonOfTurnAll"  @click="confirmDelete()"  class="remove-group close-button">X</button>
+                <ButtonMy @click.stop="!doesDeviceOutOfRange ? turnOnAllDebounced($event) : showTooltip = !showTooltip" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
+                  <PhCheck v-if="devicesAllTurn" :size="32" />
+                  <PhPower v-else :size="32" />
+                </ButtonMy>
+              </div>
                 <h3 v-if="!doesChangeGroupName" class="header-group header-group-pencil">{{ groupName }} <span v-if="doesChangeGroupNameProps" @click="changeGroupNameFunc()"><PhPencil :size="32" /></span></h3>
                 <div v-else class="changeGroupNameBlock">
                   <PhXCircle @click="changeGroupNameFunc()" :size="32" />
@@ -13,10 +19,6 @@
                 <p>Tretnutno ne mozežete da upalite ili ugasite uređaje, verovatno su neki ili svi van mreže</p>
               </info-tooltip>
 
-                <ButtonMy  @click.stop="!doesDeviceOutOfRange ? turnOnAll($event) : showTooltip = !showTooltip" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
-                  <PhCheck v-if="devicesAllTurn" :size="32" />
-                  <PhPower v-else :size="32" />
-                </ButtonMy>
             </div>
             <div class="line-block">
                 <hr />
@@ -26,9 +28,9 @@
                 <i class="fa-solid fa-arrow-down"></i>
             </div>
             <transition name="slidedown" mode="out-in">
-                <div v-if="showMenuProp || automaticOpen" class="slide-menu main">
+                <div v-show="showMenuProp || automaticOpen" class="slide-menu main">
                     <template v-if="devices && devices.length > 0">
-                        <item-block v-for="item in devices" :key="item.id" :data="item">
+                        <item-block v-for="item in devices" :key="item.id" :data="item" v-memo="[item.status]">
                         </item-block>
                     </template>
                     <template v-if="devices && devices.length === 0">
@@ -60,7 +62,7 @@
 
     </template>
 <script setup>
-import { ref, defineProps, computed, watch} from 'vue';
+import {ref, defineProps, computed, watch, shallowRef} from 'vue';
 import itemBlock from './itemBlock.vue';
 import modalLayout from '../modalLayout.vue';
 import { showModal } from '@/composables/modal'; // Uvođenje composable-a
@@ -101,7 +103,7 @@ const props = defineProps({
     },
     automaticOpen: {
         required: false,
-        defualt: false
+        default: false
     },
     addDeviceOptions:{
       required : false,
@@ -115,10 +117,10 @@ const props = defineProps({
     id: Number,
     idDevice: Number,
 })
-const devicesProba = ref(props.devices);
+const devicesProba = shallowRef(props.devices);
 watch(()=>props.devices,(newValue)=>{
     devicesProba.value = newValue;
-},{ deep: false })
+})
 
 // const checkRangeOfDevice = ()=>{
 //   return props.devices.some(x=>x.is_out_of_range);
@@ -150,6 +152,10 @@ const setNewForms = (selectedForms) => {
   }
   activeForms.value = selectedForms
 };
+import { debounce } from 'lodash-es';
+
+const turnOnAllDebounced = debounce(turnOnAll, 300);
+
 function turnOnAll() {
     activeForms.value = null;
     shouldTurnOn.value = devicesProba.value.filter(device => device.status).length!==devicesProba.value.length;
@@ -245,6 +251,7 @@ const newGroupName = ref(props.groupName);
   background-color: transparent !important;
   border:none !important;
   border-bottom: 2px solid black !important;
+  font-size: 16px !important;
 }
 
 .w-100 {
@@ -269,15 +276,11 @@ const newGroupName = ref(props.groupName);
 }
 
 .glowEffect {
-    /* transition: all 300ms; */
     box-shadow: 0 0 20px 2px #fff;
-    /* filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff) drop-shadow(0 0 30px #fff) drop-shadow(0 0 80px #fff); */
 }
-
 .line-block {
     position: relative;
 }
-
 .load-line {
     display: block;
     width: 0%;
@@ -348,7 +351,6 @@ const newGroupName = ref(props.groupName);
 
 .customCheckbox {
     appearance: none;
-    background-color: var(--form-background);
     margin: 0;
     font: inherit;
     color: currentColor;
@@ -384,6 +386,7 @@ input.moje:checked~.arrowPravi::after {
     height: 40px;
 }
 .activeAll {
+    position: relative;
     margin-left: auto;
     margin-right: 10px;
     border-color: white;
@@ -416,6 +419,7 @@ input.moje:checked~.arrowPravi::after {
     min-height: 120px;
     align-items: center;
     margin-left: 30px;
+    flex-wrap: wrap;
 }
 
 .group-items {
@@ -453,12 +457,16 @@ button {
 
 .slide-menu {
   will-change: opacity, max-height;
+  padding-bottom: 3vh;
+  flex-wrap: wrap;
 }
 .py-5{
   padding: 10px ;
 }
-.slide-menu{
-  padding-bottom: 3vh;
+.remove-group-block{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
-
+.remove-group-block > *{}
 </style>

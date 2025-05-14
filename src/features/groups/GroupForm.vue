@@ -1,6 +1,5 @@
 <template>
     <Form :validation-schema="schema" :initial-values="formValues" @submit="finishWithoutDevices">
-
         <FormInput v-model="formValues.grupaUredjaja" id="grupaUredjaja" name="grupaUredjaja" label="Nazovite novu grupu uredjaja :" />
         <!-- <div class="button-form-group">
             <button type="submit" class="form-button">Kreiraj grupu</button>
@@ -10,9 +9,6 @@
                 uredjaje</small>
         </div> -->
     </Form>
-
-
-
 </template>
 <script setup>
 import * as yup from 'yup';
@@ -115,6 +111,7 @@ input {
     width: 100%;
     border-radius: 10px;
     outline: none;
+    font-size: 16px !important;
 }
 
 .form-button {

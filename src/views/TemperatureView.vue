@@ -5,7 +5,7 @@
             <ButtonMy @click="getDevices('heating')" class="tempButtonStyle" :class="{activeButtonClass : activeButton === 1}">Prikaži uređaje za grejanje</ButtonMy>
             <ButtonMy @click="getDevices('cooling')" class="tempButtonStyle" :class="{activeButtonClass : activeButton === 2}">Prikaži uređaje za hladjenje</ButtonMy>
         </div>
-        <group-items :does-change-group-name-props="false" :add-device-options="false" :automaticOpen="openSlide" :devices="devicesActive" :showButtonOfTurnAll="false" groupName="Lista uredjaja"></group-items>
+        <group-items class="temperature-block" :does-change-group-name-props="false" :add-device-options="false" :automaticOpen="openSlide" :devices="devicesActive" :showButtonOfTurnAll="false" groupName="Lista uredjaja"></group-items>
     </div>
 </template>
 <script setup>
@@ -67,4 +67,5 @@ onMounted(() => {
     .tempButtonStyle{
       color:black !important;
     }
+
 </style>

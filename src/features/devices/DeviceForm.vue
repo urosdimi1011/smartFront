@@ -150,6 +150,7 @@ input {
     width: 100%;
     border-radius: 10px;
     outline: none;
+    font-size:16px !important;
 }
 
 .form-button {

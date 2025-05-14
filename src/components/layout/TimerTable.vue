@@ -195,7 +195,6 @@ const editingRows = ref([]);
 
 const onRowEditSave = async (event) => {
     let { newData } = event;
-    console.log(newData.time);
     const dataForSend = {
         "name": newData.name,
         "time": newData.time,
@@ -205,7 +204,6 @@ const onRowEditSave = async (event) => {
         "idsDevice": newData.devices.map(x => x.id),
         "idsDays": newData.days.map(x => x.id)
     }
-
     try {
         await store.dispatch("timer/changeTimer", dataForSend);
         toast.success("Uspesno ste izmenili tajmer", {
