@@ -118,8 +118,7 @@ const submit = async (values) => {
     background-color: #fff !important;
 }
 .groups-items{
-  //align-items: stretch !important;
-  min-height: 8vh;
+  min-height: 7vh;
 }
 .groups-items p{
     width: 70%;

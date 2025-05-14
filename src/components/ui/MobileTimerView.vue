@@ -9,17 +9,17 @@
           {{ timer.name }}
         </div>
         <div class="text-base font-medium truncate">
-          {{ timer.time }}
+          {{ formatTime(timer.time) }}
         </div>
         <!-- Status -->
+        <div class="text-right text-sm text-blue-600">
+          <button @click="openDialog(timer)">Detalji</button>
+        </div>
         <div class="flex justify-center">
           <ToggleSwitch
               :modelValue="Boolean(timer.status)"
               @update:modelValue="(val) => toggleStatus(timer, val)"
           />
-        </div>
-        <div class="text-right text-sm text-blue-600">
-          <button @click="openDialog(timer)">Detalji</button>
         </div>
       </div>
     </template>
@@ -55,7 +55,10 @@ const formatDevices = (arr) => {
   if (!arr || !arr.length) return 'Nema';
   return arr.map(x => x.name).join(', ');
 };
-
+const formatTime = (time) => {
+  if (!time) return '';
+  return time.split(':').slice(0, 2).join(':'); // Uklanja sekunde
+};
 onMounted(async () => {
   await getAllTimers();
 })
@@ -96,6 +99,7 @@ const openDialog = (timer) => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   align-items: center;
+  gap:1rem;
   padding: 12px; /* ekvivalent Tailwind-ovom p-3 */
   border-bottom: 1px solid #e5e7eb; /* Tailwind border-gray-200 */
   transition: background-color 0.2s ease;

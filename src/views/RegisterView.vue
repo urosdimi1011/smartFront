@@ -1,23 +1,15 @@
 <template>
     <div class="wrap-black">
         <div class="login-form">
-            <!-- Za sutra taskovi kada ustanes (3 taska), zamisli da je ovo PRAVI POSAO I DA OVO MORAS DA ODRADIS!
-             SAD JESAM U HAJPU I RADI MI SE ALI MORAS I OVO DA ODRADIS!!:
-                + 1. Treba da kreiram laravel app, i da omogucimm dodavanje korisnika, znaci prva stvar jeste logovanje i registracija na sam sistem
-                - 2. Odradi sa STOROM sve sto treba za logovanje i registraciju
-                + 3. Ostalo sta da odradis je na meni (Baza da se zavrsi dizajn!!!!)
-            -->
             <h1>Registruj se</h1>
             <Form @submit="submit" :validation-schema="schema">
                 <FormInput name="email" label="Unesite email" />
                 <FormInput name="username" label="Unesite korisnicko ime" />
                 <FormInput type="password" name="password" label="Unesite lozinku" />
                 <FormInput type="password" name="confPassword" label="Ponovite lozinku" />
-
                 <strong>Imate nalog? <router-link :to="'Login'">Uloguj se</router-link></strong>
-
                 <ButtonMy>Registruj se</ButtonMy>
-                <p v-if="errorMsg">{{ errorMsg }}</p>
+                <p class="error-msg" v-if="errorMsg">{{ errorMsg }}</p>
             </Form>
         </div>
 
@@ -38,8 +30,8 @@ const store = useStore();
 
 const schema = yup.object({
     email: yup.string().required("Morate uneti email").min(7),
-    password: yup.string().required("Morate uneti sifru").min(7),
-    username: yup.string().required("Morate uneti korisnicko ime").min(7),
+    password: yup.string().required("Morate uneti sifru").min(4,"Šifra mora biti veća od 3 karaktera"),
+    username: yup.string().required("Morate uneti korisnicko ime"),
     confPassword: yup.string().required("Morate ponoviti istu sifru")
         .oneOf([yup.ref('password')], 'Lozinke se ne poklapaju')
 })
@@ -53,7 +45,7 @@ const submit = async (values) => {
         router.push("/login");
     }
     catch (poruka) {
-        if(poruka == 500){
+        if(poruka === 500){
             errorMsg.value = "Email sa takvim nazivom vec postoji u bazi";
         }
         else{
@@ -67,7 +59,10 @@ const submit = async (values) => {
 * {
     color: white;
 }
-
+.error-msg{
+  margin-top: 1em;
+  color:#DC2626;
+}
 .wrap-black {
     background-color: rgba(0, 0, 0, 0.8);
     position: fixed;
@@ -77,7 +72,7 @@ const submit = async (values) => {
     right: 0;
     width: 100%;
     height: 100%;
-    z-index: 1;
+    z-index: 2;
 }
 
 body {

@@ -7,7 +7,7 @@
                 <FormInput type="password" name="password" label="Unesite password" />
                 <strong>Nemate nalog? <router-link :to="'Register'">Registruj</router-link></strong>
                 <ButtonMy class="set-width">Uloguj se</ButtonMy>
-                <p v-if="errorMsg">{{ errorMsg }}</p>
+                <p class="error-msg" v-if="errorMsg">{{ errorMsg }}</p>
             </Form>
         </div>
 
@@ -27,7 +27,7 @@ const store = useStore();
 const errorMsg = ref('');
 const schema = yup.object({
     email: yup.string().required("Morate uneti email").min(7),
-    password: yup.string().required("Morate uneti sifru").min(7),
+    password: yup.string().required("Morate uneti sifru").min(3,"Šifra mora biti veća od 3 karaktera"),
 })
 
 const submit = async (values) => {
@@ -49,7 +49,10 @@ const submit = async (values) => {
 * {
     color: white;
 }
-
+.error-msg{
+  margin-top: 1em;
+  color:#DC2626;
+}
 .wrap-black {
     background-color: rgba(0, 0, 0, 0.8);
     position: fixed;
@@ -59,7 +62,7 @@ const submit = async (values) => {
     right: 0;
     width: 100%;
     height: 100%;
-    z-index: 1;
+    z-index: 2;
 }
 .set-width{
   width: 100%;

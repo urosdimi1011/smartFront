@@ -121,6 +121,7 @@
       outline: none;
       padding: 10px 10px;
       font-size:16px !important;
+      border: 1px solid rgba(0,0,0,0.2);
   }
   .w {
       width: 100%;

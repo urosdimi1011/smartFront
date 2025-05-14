@@ -75,8 +75,8 @@
 
     <modal-layout v-model:currentStepIndexProps="stepIndex" :steps="components" :visible="isOpen" @close="close()">
       <template v-if="components.length > 1" #steps="{ nextStep, hasNext, previousStep }">
-        <ButtonMy v-if="hasNext()" @click="nextStep()" class="form-button">Pogledaj listu dodatih tajmera </ButtonMy>
-        <ButtonMy v-else @click="previousStep()" class="form-button">Vrati se na dodavanje tajmera </ButtonMy>
+        <ButtonMy v-if="hasNext()" @click="nextStep()" class="form-button">Lista tajmera</ButtonMy>
+        <ButtonMy v-else @click="previousStep()" class="form-button">Dodaj tajmer</ButtonMy>
       </template>
     </modal-layout>
 
@@ -220,7 +220,7 @@ const prevPage = () => {
   margin: 0px;
   padding: 0px;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 a {
@@ -231,7 +231,7 @@ input:focus {
   touch-action: manipulation;
 }
 .form-group span{
-  color:rgba(255,0,0,0.5);
+  color:#DC2626;
 }
 .close-button{
   overflow: hidden;
@@ -385,7 +385,7 @@ input:focus {
   color: #fff;
   text-transform: uppercase;
   margin-top: 10px;
-  font-family: 'Poppins', sans-serif;
+  //font-family: 'Poppins', sans-serif;
 }
 
 .lamp:hover {
@@ -455,7 +455,7 @@ input:focus {
 .register-form {
   height: max-content;
   width: 700px;
-  background-color: rgba(255, 255, 255, 0.13);
+  background-color: #012a54;
   position: absolute;
   transform: translate(-50%, -50%);
   top: 50%;
@@ -470,7 +470,7 @@ input:focus {
 
 .login-form *,
 .register-form * {
-  font-family: 'Poppins', sans-serif;
+  //font-family: 'Poppins', sans-serif;
   color: #ffffff;
   letter-spacing: 0.5px;
   outline: none;
@@ -496,10 +496,10 @@ input:focus {
 .login-form input,
 .register-form input {
   display: block;
-  height: 50px;
+  height: 5vh;
   width: 100%;
   background-color: rgba(255, 255, 255, 0.07);
-  border-radius: 3px;
+  border-radius: 0.5rem;
   padding: 0 10px;
   margin-top: 8px;
   font-size: 14px;
@@ -969,7 +969,8 @@ button:active {
     padding: 7px 10px;
   }
   input{
-    font-size:16px !important;
+    font-size:1rem !important;
+    padding: 8px ;
   }
   .arrowPravi{
     width: 100% !important;
@@ -985,12 +986,11 @@ button:active {
 }
 
 @media only screen and (max-width: 400px) {
-  .error-msg{
-    font-size:15px !important;
+  .error-msg,.form-group span{
+    font-size:14px !important;
   }
-
   .modal-content{
-    width:80vw !important;
+    width:90vw !important;
   }
   .activeAll{
     width: 7vw !important;
@@ -1026,6 +1026,12 @@ button:active {
   .login-form {
     left: 50%;
     height: max-content;
+    max-height: 90vh;
+    overflow-x: scroll;
+    padding-top: 3rem;
+  }
+  .login-form h1{
+    font-size: 1.5rem;
   }
 
   .tabs input:nth-child(1):checked~.buttons .underline {
@@ -1065,8 +1071,11 @@ button:active {
     width: 45%;
     overflow: hidden;
   }
-  .groups-items p,.form-group label{
+  .groups-items p{
       font-size:16px !important;
+  }
+  .form-group label{
+    font-size:14px !important;
   }
   .temperature-block .lamp{
     width: 80%;

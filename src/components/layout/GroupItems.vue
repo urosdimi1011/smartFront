@@ -9,12 +9,24 @@
                   <PhPower v-else :size="32" />
                 </ButtonMy>
               </div>
-                <h3 v-if="!doesChangeGroupName" class="header-group header-group-pencil">{{ groupName }} <span v-if="doesChangeGroupNameProps" @click="changeGroupNameFunc()"><PhPencil :size="32" /></span></h3>
-                <div v-else class="changeGroupNameBlock">
-                  <PhXCircle @click="changeGroupNameFunc()" :size="32" />
-                  <FormInput class="form-input" id="groupName" name="groupName" v-model="newGroupName"/>
-                  <button-my @click="changeGroupName()">Izmeni</button-my>
-                </div>
+              <h3 v-if="!doesChangeGroupName" class="header-group">
+                {{ groupName }}
+                <span v-if="doesChangeGroupNameProps" @click="changeGroupNameFunc()" class="edit-icon">
+                    <PhPencil :size="20" />
+                </span>
+              </h3>
+              <div v-else class="inline-edit-wrapper">
+                <input
+                    v-model="newGroupName"
+                    type="text"
+                    class="inline-input"
+                    @keyup.enter="changeGroupName"
+                    @keyup.esc="changeGroupNameFunc"
+                />
+                <button @click="changeGroupName" class="confirm-btn"><PhCheckSquare :size="23" weight="thin" /></button>
+                <button @click="changeGroupNameFunc" class="cancel-btn"><PhXSquare :size="23" weight="light" /></button>
+              </div>
+
               <info-tooltip class="customToolTip" v-if="doesDeviceOutOfRange && showTooltip" @close="changeDisplayOfTooltip">
                 <p>Tretnutno ne mozežete da upalite ili ugasite uređaje, verovatno su neki ili svi van mreže</p>
               </info-tooltip>
@@ -74,7 +86,7 @@ import { useToast } from 'vue-toastification';
 import ButtonMy from "@/components/ui/ButtonMy.vue";
 import FormInput from "@/components/ui/FormInput.vue";
 import ProgressSpinner from 'primevue/progressspinner';
-import {PhCheck, PhPencil, PhXCircle, PhPower} from "@phosphor-icons/vue";
+import {PhCheck, PhPencil, PhXCircle, PhPower, PhCheckSquare, PhXSquare} from "@phosphor-icons/vue";
 import InfoTooltip from "@/components/ui/InfoTooltip.vue";
 
 // import device from '@/store/modules/device';
@@ -317,7 +329,7 @@ const newGroupName = ref(props.groupName);
 }
 
 .header-group {
-    width: 50%;
+    width: 80%;
     display: flex;
     align-items:center;
     gap:25px;
@@ -442,16 +454,17 @@ button {
 }
 
 .slidedown-enter-active, .slidedown-leave-active {
-  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  transition: max-height 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 .slidedown-enter-from, .slidedown-leave-to {
-  opacity: 0;
+  //opacity: 0;
   max-height: 0;
 }
 
 .slidedown-enter-to, .slidedown-leave-from {
-  opacity: 1;
+  //opacity: 1;
   max-height: 500px; /* Postavi visinu */
 }
 
@@ -468,5 +481,40 @@ button {
   display: flex;
   justify-content: space-between;
 }
-.remove-group-block > *{}
+.inline-edit-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inline-input {
+  font-size: 1.125rem; /* ~18px */
+  font-weight: 500;
+  color:#fff;
+  border: none;
+  border-bottom: 1px solid #d1d5db;
+  outline: none;
+  background: transparent;
+  padding: 2px 4px;
+  transition: border-color 0.2s;
+}
+.inline-input:focus {
+  border-color: #3b82f6; /* blue-500 */
+}
+
+.confirm-btn,
+.cancel-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+.confirm-btn:hover,
+.cancel-btn:hover {
+  transform: scale(1.1);
+}
+
 </style>
