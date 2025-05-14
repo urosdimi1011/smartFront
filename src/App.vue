@@ -985,6 +985,13 @@ button:active {
 }
 
 @media only screen and (max-width: 400px) {
+  .error-msg{
+    font-size:15px !important;
+  }
+
+  .modal-content{
+    width:80vw !important;
+  }
   .activeAll{
     width: 7vw !important;
     height: 4vh !important;
@@ -1102,8 +1109,9 @@ button:active {
   .user-body li{
     font-size: 16px !important;
   }
-  button{
+  .form-button,.modal-footer button{
     font-size:15px !important;
+    padding: 6px 9px !important;
   }
 }
 

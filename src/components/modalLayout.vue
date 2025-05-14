@@ -220,7 +220,7 @@ const changeValuesOnForm = (val) => {
   background: white;
   padding: 20px;
   width: 500px;
-  max-width: 100%;
+  max-width: 90vw;
   max-height: 80vh;
   height:max-content;
   block-size: fit-content;
@@ -264,6 +264,7 @@ const changeValuesOnForm = (val) => {
 .modal-footer {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
   border-top: 1px solid #ccc;
   padding-top: 10px;
 }
