@@ -1,6 +1,6 @@
   <template>
     <div class="group-content">
-      <div v-show="localItems && groups && groups.length > 0" id="LightPage">
+      <div v-if="localItems && groups && groups.length > 0" id="LightPage">
         <draggable v-model="localItems" group="components" item-key="id" @end="onEnd"
                    @update:modelValue="onModelUpdate"
                    :animation="200"
@@ -54,17 +54,21 @@ import { useToast } from 'vue-toastification';
 import ProgressSpinner from 'primevue/progressspinner';
 import {setItem} from "@/config/indexedDB";
 
+const groups = computed(()=>{
+    return store.getters['group/getAllGroups'];
+});
+
+
 onMounted(async () => {
   loadingSpiner.value = true;
 
   await fetchItems();
-  groups.value = store.getters['group/getAllGroups'];
   localItems.value = groups.value;
   loadingSpiner.value = false;
 });
 
 const onModelUpdate = (newValue) => {
-  groups.value = [...newValue];
+  store.commit('group/setGroups',[...newValue]);
 }
 defineOptions({
   inheritAttrs: false
@@ -80,7 +84,6 @@ const onEnd = async () => {
 };
 const { isOpen, show, close } = showModal();
 const store = useStore();
-const groups = ref([]);
 const toast = useToast();
 const steps = shallowRef([{ component: GroupForm, props: { previousValue: {},title:"Kreiraj novu grupu" } }
   ,{ component: DeviceFormCheckBox, props: { previousValue: {},title:"Izaberi uredjaje" } }]);
@@ -95,7 +98,7 @@ const devicesAll = computed(()=>{
 })
 
 const showModalDevice = (which) => {
-  if (which == 1) {
+  if(which === 1) {
     condicional.value = true;
   }
   else {

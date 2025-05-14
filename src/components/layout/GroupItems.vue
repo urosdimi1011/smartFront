@@ -393,7 +393,6 @@ input.moje:checked~.arrowPravi::after {
     display: inline-block;
     width: 40px;
     background-color: transparent;
-    //border: 2px solid #fff;
     border-radius: 2px;
     height: 40px;
 }
@@ -401,10 +400,9 @@ input.moje:checked~.arrowPravi::after {
     position: relative;
     margin-left: auto;
     margin-right: 10px;
-    border-color: white;
+    border:1px solid #fff;
     width: 3vw;
     height: 5vh;
-    /* margin-left: 10px; */
     padding: 10px;
 }
 .activeAll svg{
