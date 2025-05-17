@@ -26,7 +26,7 @@ const router = useRouter();
 const store = useStore();
 const errorMsg = ref('');
 const schema = yup.object({
-    email: yup.string().required("Morate uneti email").min(7),
+    email: yup.string().required("Morate uneti email"),
     password: yup.string().required("Morate uneti sifru").min(3,"Šifra mora biti veća od 3 karaktera"),
 })
 

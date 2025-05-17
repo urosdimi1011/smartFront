@@ -447,8 +447,8 @@ input:focus {
 
 .background-block {
   background-color: rgba(255, 255, 255, 0.13);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+  //border: 2px solid rgba(255, 255, 255, 0.1);
+  //box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
 }
 
 .login-form,
@@ -1137,6 +1137,7 @@ button:active {
   font-size: 12px;
   width: 40%;
   padding: 10px 0px;
+  border:1px solid rgba(255,255,255,0.1);
 }
 
 .smooth-fade-enter-active,

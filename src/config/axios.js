@@ -1,6 +1,21 @@
 import axios from 'axios';
 import store from '@/store'; // Importuj Vuex store
-// https://smarteraback.razmenidom.com
+
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+
+    failedQueue = [];
+};
+
 const instance = axios.create({
     baseURL: 'https://smarteraback.razmenidom.com',  // Ovde stavite svoju osnovnu URL adresu
     timeout: 20000,  // Timeout za zahteve (10 sekundi)
@@ -22,23 +37,44 @@ instance.interceptors.request.use(config => {
 }, error => {
     return Promise.reject(error);
 });
-instance.interceptors.response.use(response => response, async error => {
-    if (error.response && error.response.status === 401 && localStorage.getItem('token')) {
-        try {
-            const refreshResponse = await store.dispatch('user/refreshToken');
-            if (refreshResponse) {
-                error.config.headers["Authorization"] = `Bearer ${store.state.user.jwt_token}`;
-                return axios.request(error.config);
-            }
-            else {
+instance.interceptors.response.use(
+    response => response,
+    async error => {
+        const originalRequest = error.config;
+
+        // Ako token nije validan i već nije pokušano
+        if (
+            error.response &&
+            error.response.status === 401 &&
+            !originalRequest._retry &&
+            !originalRequest.url.includes("/api/refresh")
+            && !isRefreshing
+        ) {
+            originalRequest._retry = true;
+
+            try {
+                const refreshResponse = await store.dispatch("user/refreshToken");
+
+                if (refreshResponse) {
+                    // Ažuriraj Authorization zaglavlje i ponovi zahtev
+                    originalRequest.headers["Authorization"] = `Bearer ${store.state.user.jwt_token}`;
+                    return axios(originalRequest);
+                } else {
+                    // Ako refresh nije uspeo, logout
+                    isRefreshing = true;
+                    await store.dispatch("user/logout");
+                    return Promise.reject(error);
+                }
+            } catch (e) {
+                // Ako refreshToken padne, logout
                 await store.dispatch("user/logout");
-                return Promise.reject(error);
+                return Promise.reject(e);
             }
         }
-        catch (error) {
-            return Promise.reject(error);
-        }
+
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
-})
+);
+
+
 export default instance;

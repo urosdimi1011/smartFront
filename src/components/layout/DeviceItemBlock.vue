@@ -1,54 +1,75 @@
 <template>
-    <div @click.stop="!data.is_out_of_range ? toggleActive() : null" :data-id="data.id" class="lamp background-block" :class="{active: active,offline : data.is_out_of_range }">
+<!--  !data.is_out_of_range ? toggleActive() : null-->
+<!--  offline : data.is_out_of_range-->
+  <template v-if="!data.is_out_of_range">
+    {{data.is_out_of_range}}
+    <div @click.stop=" toggleActive()" :data-id="data.id" class="lamp background-block" :class="{active: active}">
       <info-tooltip :text="printTextFotTooltip()"></info-tooltip>
       <div class="content-up">
-         <div>
-                <template v-if="data.category.name === 'Plug' && data.status === 0">
-                    <PhPlugs :size="48" />
-                </template>
-                <template v-if="data.category.name === 'Plug' && data.status">
-                    <PhPlugsConnected :size="48" />
-                </template>
-                <template v-if="data.category.name !== 'Plug'">
-                    <i :class="data.category.icon"></i>
-                </template>
-                <div v-if="showInputField" class="name-block">
-                    <p>{{ data.name }}</p>
-                </div>
-                <div @click.stop v-if="!showInputField" class="form-change-input">
-                    <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
-                    <ButtonMy class="color-button" @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
-                </div>
-              <div v-if="data.is_out_of_range" class="outOfRange">
-                <p>Uredjaj je van mreže</p>
-                <p><PhWifiX :size="32" /></p>
-              </div>
-            </div>
+        <div>
+          <template v-if="data.category.name === 'Plug' && data.status === 0">
+            <PhPlugs :size="48" />
+          </template>
+          <template v-if="data.category.name === 'Plug' && data.status">
+            <PhPlugsConnected :size="48" />
+          </template>
+          <template v-if="data.category.name !== 'Plug'">
+            <i :class="data.category.icon"></i>
+          </template>
+          <div v-if="showInputField" class="name-block">
+            <p>{{ data.name }}</p>
+          </div>
+          <div @click.stop v-if="!showInputField" class="form-change-input">
+            <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
+            <ButtonMy class="color-button" @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
+          </div>
+          <!--           v-if="data.is_out_of_range"-->
+          <div v-if="!data.is_out_of_range" class="outOfRange">
+            <p>Uredjaj je van mreže</p>
+            <p><PhWifiX :size="32" /></p>
+          </div>
         </div>
-        <div class="content-down">
-            <!-- <hr class="line"/> -->
-            <button class="down-button" @click.stop="showAdcConf()"><i :class="{ rotate: doShowAdcConf }"
-                    class="fa-solid fa-arrow-down"></i></button>
-            <transition name="slidedown" mode="out-in">
-                <div @click.stop v-if="doShowAdcConf" class="content-conf">
-                  <button @click.stop="removeDevice()">
-                        <span><i class="fa-solid fa-trash"></i></span>
-                    </button>
-                    <button @click.stop="changeNameOfInput()">
-                        <span><i class="fa-solid fa-pencil"></i></span>
-                    </button>
-                  <button @click.stop="showConfigModal()" v-if="data.hasBrightness">
-                    <span><i class="fa-solid fa-gear"></i></span>
+      </div>
+      <div class="content-down">
+        <!-- <hr class="line"/> -->
+        <button class="down-button" @click.stop="showAdcConf()"><i :class="{ rotate: doShowAdcConf }"
+                                                                   class="fa-solid fa-arrow-down"></i></button>
+        <transition name="slidedown" mode="out-in">
+          <div @click.stop v-if="doShowAdcConf" class="content-conf">
+            <button @click.stop="removeDevice()">
+              <span><i class="fa-solid fa-trash"></i></span>
+            </button>
+            <button @click.stop="changeNameOfInput()">
+              <span><i class="fa-solid fa-pencil"></i></span>
+            </button>
+            <button @click.stop="showConfigModal()" v-if="data.hasBrightness">
+              <span><i class="fa-solid fa-gear"></i></span>
 
-                  </button>
-                </div>
-            </transition>
-        </div>
-        <Teleport to="body">
-            <modal-layout :title="titleOfModal" :props="defineMyProps" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
-            </modal-layout>
-        </Teleport>
+            </button>
+          </div>
+        </transition>
+      </div>
+      <Teleport to="body">
+        <modal-layout :title="titleOfModal" :props="defineMyProps" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
+        </modal-layout>
+      </Teleport>
     </div>
+  </template>
+  <template v-else>
+    <div class="offline lamp background-block">
+      <info-tooltip :text="printTextFotTooltip()"></info-tooltip>
+      <div class="content-up">
+        <div>
+          <!--           v-if="data.is_out_of_range"-->
+          <div class="outOfRange">
+            <p>Uredjaj <strong>{{ data.name }}</strong> je van mreže</p>
+            <p>Vreme: {{ formatDate(data.updated_date) }}</p>
+            <p><PhWifiX :size="32" /></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
 </template>
 <script setup>
 import {ref, defineProps, defineOptions,computed} from 'vue';
@@ -112,7 +133,6 @@ const showConfigModal = ()=>{
   titleOfModal.value = "Podesite osvetljenje";
   show(BrightnessLayout);
 }
-
 const deleteDevice = async () => {
     //slanje zahteva za brisanje
     try {
@@ -123,11 +143,9 @@ const deleteDevice = async () => {
         toast.error(error.message, { timeout: 3000 });
     }
 }
-
 function onInputChange(event) {
     tempName.value = event.target.value;
 }
-
 function changeNameOfInput() {
     showInputField.value = !showInputField.value;
 }
@@ -150,6 +168,18 @@ async function changeName() {
         });
     }
 }
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const dan = String(date.getDate()).padStart(2, '0');
+  const mesec = String(date.getMonth() + 1).padStart(2, '0');
+  const godina = date.getFullYear();
+  const sati = String(date.getHours()).padStart(2, '0');
+  const minuti = String(date.getMinutes()).padStart(2, '0');
+  return `${dan}.${mesec}.${godina}. ${sati}:${minuti}`;
+}
+
+
 </script>
 <style scoped>
 .color-button{
@@ -170,13 +200,6 @@ ul{
 
 .form-change-input button i {
     font-size: 25px;
-}
-.outOfRange{
-  position: absolute;
-  top:0;
-  z-index: 1;
-  width:100%;
-  left: 0;
 }
 .outOfRange p{
   color:black;

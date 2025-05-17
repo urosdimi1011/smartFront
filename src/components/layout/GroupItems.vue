@@ -40,7 +40,7 @@
                 <i class="fa-solid fa-arrow-down"></i>
             </div>
             <transition name="slidedown" mode="out-in">
-                <div v-show="showMenuProp || automaticOpen" class="slide-menu main">
+                <div v-if="showMenuProp || automaticOpen" class="slide-menu main">
                     <template v-if="devices && devices.length > 0">
                         <item-block v-for="item in devices" :key="item.id" :data="item" v-memo="[item.status]">
                         </item-block>
