@@ -86,8 +86,7 @@ export default {
         async refreshToken({ commit }) {
             try {
                 const response = await api.post("/api/refresh");
-                console.log(response.status);
-                commit('setJwtToken', response.data.token)
+                commit('setJwtToken', response.data.token);
                 return true;
 
             }

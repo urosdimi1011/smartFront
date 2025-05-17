@@ -1,6 +1,7 @@
 import axios from 'axios';
 import store from '@/store'; // Importuj Vuex store
-
+import {useToast} from "vue-toastification";
+const toast= useToast();
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -15,7 +16,6 @@ const processQueue = (error, token = null) => {
 
     failedQueue = [];
 };
-
 const instance = axios.create({
     baseURL: 'https://smarteraback.razmenidom.com',  // Ovde stavite svoju osnovnu URL adresu
     timeout: 20000,  // Timeout za zahteve (10 sekundi)
@@ -71,7 +71,7 @@ instance.interceptors.response.use(
                 return Promise.reject(e);
             }
         }
-
+        toast.error(error);
         return Promise.reject(error);
     }
 );

@@ -42,7 +42,7 @@ export default {
                 return response.data.devices;
             }
             catch (error) {
-                throw Error(error.message);
+                throw Error(error);
             }
         },
         async changeStatusOfDevice({ dispatch }, { id, status,pin }) {
@@ -54,7 +54,7 @@ export default {
                 return response;
             }
             catch (error) {
-                throw Error(error.message);
+                throw Error(error);
 
             }
 
@@ -73,7 +73,7 @@ export default {
                     console.error("Network error:", error.message);
                 }
 
-                throw Error(error.message);
+                throw Error(error);
             }
         },
         async changeNameOfDevice({ dispatch }, { id, name }) {
@@ -91,7 +91,7 @@ export default {
                     console.error("Network error:", error.message);
                 }
 
-                throw Error(error.message);
+                throw Error(error);
             }
         },
         async deleteDevice({ dispatch }, { id }) {
@@ -102,7 +102,7 @@ export default {
                 return response;
             }
             catch (error) {
-                throw Error(error.message);
+                throw Error(error);
             }
         },
         async changeBrightnessForDevice({dispatch},{id,brightness}){
@@ -113,7 +113,7 @@ export default {
                 return response;
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error);
             }
         },
         async getAllDevicesForTemperature({commit},type){
@@ -123,7 +123,7 @@ export default {
                 return response;
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error);
             }
         },
         async setDataOfDeviceForTemperature({commit},payload){
@@ -133,7 +133,7 @@ export default {
                 return response;
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error);
             }
         }
     },

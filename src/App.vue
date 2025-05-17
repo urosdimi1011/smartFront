@@ -877,7 +877,7 @@ button:active {
     width: 40%;
   }
   .activeAll{
-    width: 4vw !important;
+    width: 5vw !important;
     height: 6vh !important;
   }
 }

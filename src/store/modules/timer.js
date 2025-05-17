@@ -45,6 +45,16 @@ export default {
                 throw Error(error.response.data.message);
             }
         },
+        async changeActivity({dispatch},payload){
+            try{
+                const response = await api.put(`/api/timer/activity/${payload.id}`,payload);
+                await dispatch("getAll");
+                return response;
+            }
+            catch(error){
+                throw Error(error.response.data.message);
+            }
+        },
         async deleteTimer({dispatch},payload){
             try{
                 const response = await api.delete(`/api/timer/${payload.id}`);
