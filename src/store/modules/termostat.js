@@ -23,14 +23,14 @@ export default {
                 return response.data.termostats;
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         },
         async addTermostat(_dispatch,payload) {
             try {
                 return await api.post(`/api/termostat`, payload);
             } catch (error) {
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         },
         async addTermostatToDevice(_dispatch,payload){
@@ -38,7 +38,7 @@ export default {
                 return await api.post(`/api/termostat/${payload.idTermostat}`,{idDevice:payload.id});
             }
             catch(error){
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         }
     },

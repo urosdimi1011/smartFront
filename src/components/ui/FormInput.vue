@@ -150,4 +150,7 @@
   .flex .p-multiselect{
     width: 50%;
   }
+  .w > div{
+    margin-bottom: 0.5rem;
+  }
   </style>

@@ -23,10 +23,11 @@
     <Dialog v-model:visible="dialogVisible" modal header="Detalji tajmera" :style="{ width: '90vw' }">
       <div v-if="editedTimer" class="space-y-2 text-sm">
         <!-- Uređaji -->
+        {{timer}}
         <div>
           <strong>Uređaji:</strong>
-          <span v-if="editingField !== 'devices'" @click="startEditing('devices')" class="cursor-pointer text-blue-600 hover:underline">
-            {{ formatDevices(editedTimer.devices) }}
+          <span v-if="!editingField" class="cursor-pointer text-blue-600 hover:underline">
+            {{ formatDevices(selectedTimer.devices) }}
           </span>
           <MultiSelect
               v-else
@@ -37,20 +38,13 @@
               placeholder="Izaberi uređaje"
               class="w-moj"
           />
-          <button-my
-              v-if="editingField == 'devices'"
-              @click="stopEditing"
-              class="w-button"
-          >
-            Gotovo
-          </button-my>
         </div>
 
         <!-- Dani -->
         <div>
           <strong>Dani:</strong>
-          <span v-if="editingField !== 'days'" @click="startEditing('days')" class="cursor-pointer text-blue-600 hover:underline">
-            {{ formatDevices(editedTimer.days) }}
+          <span v-if="!editingField" class="cursor-pointer text-blue-600 hover:underline">
+            {{ formatDevices(selectedTimer.days) }}
           </span>
           <MultiSelect
               v-else
@@ -61,42 +55,32 @@
               placeholder="Izaberi dane"
               class="w-moj"
           />
-          <button-my
-              v-if="editingField == 'days'"
-              @click="stopEditing"
-              class="w-button"
-          >
-            Gotovo
-          </button-my>
         </div>
 
         <!-- Vreme -->
         <div>
           <strong>Vreme:</strong>
-          <span v-if="editingField !== 'time'" @click="startEditing('time')" class="cursor-pointer text-blue-600 hover:underline">
-            {{ editedTimer.time }}
+          <span v-if="!editingField" class="cursor-pointer text-blue-600 hover:underline">
+            {{ selectedTimer.time }}
           </span>
           <input
               v-else
               type="time"
               v-model="editedTimer.time"
               class="border p-1 rounded"
-              @blur="stopEditing"
           />
         </div>
 
         <!-- Status -->
         <div>
           <strong>Akcija tajmera:</strong>
-          <span v-if="editingField !== 'status'" @click="startEditing('status')" class="cursor-pointer text-blue-600 hover:underline">
-            {{ editedTimer.status ? 'Uključivanje' : 'Isključivanje' }}
+          <span v-if="!editingField" class="cursor-pointer text-blue-600 hover:underline">
+            {{ selectedTimer.status ? 'Uključivanje' : 'Isključivanje' }}
           </span>
           <select
               v-else
               v-model="editedTimer.status"
               class="border p-1 rounded"
-              @blur="stopEditing"
-              @change="stopEditing"
           >
             <option :value="1">Uključivanje</option>
             <option :value="0">Isključivanje</option>
@@ -105,8 +89,14 @@
 
         <!-- Dugme za čuvanje izmena -->
         <div class="pt-2 text-right">
-          <button-my @click="saveChanges" class="form-button">
+          <button-my v-if="editingField" @click="saveChanges" class="form-button">
             Sačuvaj izmene
+          </button-my>
+          <button-my v-else @click="startEditing" class="form-button">
+            Izmeni
+          </button-my>
+          <button-my v-if="editingField" @click="stopEditing" class="form-button">
+            Poništi izmenu
           </button-my>
         </div>
       </div>
@@ -125,7 +115,7 @@ import { useToast } from 'vue-toastification';
 const dialogVisible = ref(false);
 const selectedTimer = ref(null);
 const editedTimer = ref(null);
-const editingField = ref(null);
+const editingField = ref(false);
 const toast = useToast();
 const selectedDayIds = ref([]);
 const selectedDevicesIds = ref([]);
@@ -187,26 +177,21 @@ const toggleStatus = async (timer, val) => {
   }
 };
 
-const startEditing = (field) => {
-  editingField.value = field;
+const startEditing = () => {
+  editingField.value = true;
 };
 
 const stopEditing = () => {
-  if (editingField.value === 'days') {
     editedTimer.value.days = availableDays.value.filter(day =>
         selectedDayIds.value.includes(day.id)
     );
-  }
-  if (editingField.value === 'devices') {
     editedTimer.value.devices = availableDevices.value.filter(day =>
         selectedDevicesIds.value.includes(day.id)
     );
-  }
-  editingField.value = null;
+  editingField.value = false;
 };
 
 const openDialog = (timer) => {
-  console.log(timer.days);
   selectedTimer.value = timer;
   selectedDayIds.value = timer.days.map(d => d.id);
   selectedDevicesIds.value = timer.devices.map(d=>d.id);
@@ -216,7 +201,7 @@ const openDialog = (timer) => {
     days: [...timer.days],
     status: Number(timer.status)
   };
-  editingField.value = '';
+  editingField.value = false;
   dialogVisible.value = true;
 };
 

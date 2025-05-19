@@ -2,7 +2,6 @@
 <!--  !data.is_out_of_range ? toggleActive() : null-->
 <!--  offline : data.is_out_of_range-->
   <template v-if="!data.is_out_of_range">
-    {{data.is_out_of_range}}
     <div @click.stop=" toggleActive()" :data-id="data.id" class="lamp background-block" :class="{active: active}">
       <info-tooltip :text="printTextFotTooltip()"></info-tooltip>
       <div class="content-up">

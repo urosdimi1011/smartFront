@@ -58,7 +58,7 @@ export default {
                 return response;
             }
             catch (error) {
-                throw Error(error);
+                throw Error(error.response.data.message);
             }
             // commit('setUser',user);
         },
@@ -79,8 +79,7 @@ export default {
                 }
             }
             catch (error) {
-                console.log(error);
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         },
         async setLocalItemFromIndexedDb({commit},payload){
@@ -112,7 +111,7 @@ export default {
                 return response.data;
             }
             catch (error) {
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         },
         async RemoveGroup({ dispatch }, id) {
@@ -122,7 +121,7 @@ export default {
                 return response.data;
             }
             catch (error) {
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         },
         async changeGroupName({dispatch},payload){
@@ -132,7 +131,7 @@ export default {
                 return response
             }
             catch (error) {
-                throw Error(error.message);
+                throw Error(error.response.data.message);
             }
         }
     },

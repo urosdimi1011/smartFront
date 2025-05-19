@@ -59,13 +59,11 @@ onMounted(() => {
         color: #fff;
     }
     .buttons button{
-        color: white;
+      color: #fff;
+      border:2px solid transparent;
     }
-    .activeButtonClass{
-        border:2px solid green;
-    }
-    .tempButtonStyle{
-      color:black !important;
+    .buttons .activeButtonClass{
+        border:2px solid #fff;
     }
 
 </style>

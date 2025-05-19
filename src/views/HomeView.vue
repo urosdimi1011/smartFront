@@ -5,7 +5,7 @@
                    @update:modelValue="onModelUpdate"
                    :animation="200"
                    :ghostClass="'dragging-item'"
-                   :delay="100">
+                   :delay="800">
           <template #item="{ element }">
             <group-items
                 v-if="element && element.name"

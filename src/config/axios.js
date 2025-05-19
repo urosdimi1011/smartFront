@@ -16,8 +16,9 @@ const processQueue = (error, token = null) => {
 
     failedQueue = [];
 };
+//https://smarteraback.razmenidom.com
 const instance = axios.create({
-    baseURL: 'https://smarteraback.razmenidom.com',  // Ovde stavite svoju osnovnu URL adresu
+    baseURL: 'http://127.0.0.1:8000',  // Ovde stavite svoju osnovnu URL adresu
     timeout: 20000,  // Timeout za zahteve (10 sekundi)
     headers: {
         'Content-Type': 'application/json',
@@ -71,7 +72,6 @@ instance.interceptors.response.use(
                 return Promise.reject(e);
             }
         }
-        toast.error(error);
         return Promise.reject(error);
     }
 );
