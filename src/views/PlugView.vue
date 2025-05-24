@@ -36,4 +36,8 @@
 
   </script>
   
-  <style></style>
+  <style scoped>
+  .header-text{
+    margin-top: 2rem;
+  }
+  </style>

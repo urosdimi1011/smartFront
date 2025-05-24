@@ -16,6 +16,7 @@ const processQueue = (error, token = null) => {
 
     failedQueue = [];
 };
+// https://smarteraback.razmenidom.com
 const instance = axios.create({
     baseURL: 'https://smarteraback.razmenidom.com',  // Ovde stavite svoju osnovnu URL adresu
     timeout: 20000,  // Timeout za zahteve (10 sekundi)
@@ -48,10 +49,10 @@ instance.interceptors.response.use(
             error.response.status === 401 &&
             !originalRequest._retry &&
             !originalRequest.url.includes("/api/refresh")
-            && !isRefreshing
+            && !isRefreshing && localStorage.getItem('token')
         ) {
             originalRequest._retry = true;
-
+            console.log("Uslii u refresh")
             try {
                 const refreshResponse = await store.dispatch("user/refreshToken");
 

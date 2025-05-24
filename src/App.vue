@@ -105,7 +105,7 @@ const components = shallowRef([
 const isOnline = ref(navigator.onLine); // Trenutni status interneta
 const isOfflinePending = ref(false); // Flag za praćenje odlaganja offline moda
 let offlineTimeout = null; // Reference za timeout funkciju
-
+let alreadyFetched = false;
 const updateOnlineStatus = () => {
   if (navigator.onLine) {
     // Ako je online, resetuj status
@@ -165,27 +165,48 @@ async function fetchItems() {
 
   }
   catch(error){
-    toast.error(error, {
-      timeout: 3000
+    const status = error.response?.status;
+    const message = error.response?.data?.message || error.message || "Greška prilikom učitavanja podataka.";
+    toast.error(`Greška: ${message}`, {
+      timeout: 2000
     });
   }
 }
 
-watch(() => route.fullPath, () => {
-  // opcionalno ako želiš da se ponovo pozove kad god se ruta promeni
-  getAllCategories();
-  fetchItems();
-});
+watch(
+    () => route.fullPath,
+    async (newPath) => {
+      if (Object.keys(routeOrder).includes(newPath)) {
+        await loadData();
+      }
+    },
+    { immediate: false }
+);
 const showUserModal = () => {
   components.value = [{ component: UserView,props: {title : 'Korisnički profil'} }];
   show();
 }
 onMounted(async () => {
-  getAllCategories();
-  await fetchItems();
+
+  if(localStorage.getItem('token')){
+    await loadData();
+  }
+
   window.addEventListener("online", updateOnlineStatus);
   window.addEventListener("offline", updateOnlineStatus);
 })
+
+async function loadData() {
+  if (alreadyFetched) return; // spreči dupliranje
+  alreadyFetched = true;
+
+  try {
+    getAllCategories();
+    await fetchItems();
+  } catch (e) {
+    toast.error("Greska prilikom ucitavanja: "+ e,{timeout:2000});
+  }
+}
 
 onUnmounted(() => {
   window.removeEventListener("online", updateOnlineStatus);
