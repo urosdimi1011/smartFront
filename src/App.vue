@@ -171,7 +171,11 @@ async function fetchItems() {
   }
 }
 
-
+watch(() => route.fullPath, () => {
+  // opcionalno ako želiš da se ponovo pozove kad god se ruta promeni
+  getAllCategories();
+  fetchItems();
+});
 const showUserModal = () => {
   components.value = [{ component: UserView,props: {title : 'Korisnički profil'} }];
   show();
