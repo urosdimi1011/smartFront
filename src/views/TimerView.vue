@@ -11,14 +11,16 @@
                     <DatePicker name="date" class="p-datepicker-time-picker-moj" v-model="templatedisplay" timeOnly />
                 </div>
                 <div class="groups-items">
-                    <p>Uredjaj treba da se:</p>
-                  <ToggleSwitch
-                      v-model="turn" name="turn">
-                    <template #handle="{ checked }">
-
-                      <i :class="['!text-xs pi', { 'pi-check': checked, 'pi-times': !checked }]" />
-                    </template>
-                  </ToggleSwitch>
+                    <p>Uređaji treba da se:</p>
+                  <div class="flex">
+                    <span>{{turn ? 'Uključe' : "Isključe"}}</span>
+                    <ToggleSwitch
+                        v-model="turn" name="turn">
+                      <template #handle="{ checked }">
+                        <i :class="['!text-xs pi', { 'pi-check': checked, 'pi-times': !checked }]" />
+                      </template>
+                    </ToggleSwitch>
+                  </div>
 <!--                    <ToggleButton name="turn" v-model="turn" size="large" onLabel="Ukljuci" offLabel="Iskljuci" />-->
                 </div>
                     <FormInput class="flex" type="groupCheckBox" v-model="selectedDays" id="days" :options="days" multiSelect

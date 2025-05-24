@@ -26,6 +26,7 @@
     <div class="maintain-block">
       <FormInput
           v-model="maintainTermostat"
+          :componentOptions="{isBinary : true}"
           id="maintain_temperature"
           name="maintain_temperature"
           type="checkbox"
@@ -38,7 +39,7 @@
     <Button @click="submit()">Sacuvaj</Button>
   </div>
   <div class="lamp background-block" v-else>
-    <h3>Trenutno nema dodati termostat za uredjaj <strong>{{ data.name }}</strong></h3>
+    <h3>Trenutno nema dodati termostat za uređaj <strong>{{ data.name }}</strong></h3>
     <ButtonMy @click="showModalMy()">Dodajte termostat</ButtonMy>
   </div>
   <Teleport to="body">

@@ -64,6 +64,18 @@ export default {
             catch(error){
                 throw Error(error.response.data.message);
             }
+        },
+        async deleteTimers({dispatch},payload){
+            try{
+                const response = await api.delete(`/api/timers`,{
+                    data: {ids : payload}
+                });
+                await dispatch("getAll");
+                return response;
+            }
+            catch(error){
+                throw Error(error.response.data.message);
+            }
         }
      
     },

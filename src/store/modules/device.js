@@ -21,12 +21,32 @@ export default {
         },
         setDeviceForTemperature(state,payload){
             state.deviceForTemperature = payload;
-        }
+        },
+        updateDevice(state, updatedDevice) {
+            const index = state.device.findIndex(d => d.id === updatedDevice.id);
+            if (index !== -1) {
+                state.device.splice(index, 1, updatedDevice);
+            }
+        },
+        updateDevices(state, updatedDevices) {
+            updatedDevices.forEach(updated => {
+                const index = state.device.findIndex(d => d.id === updated.id);
+                if (index !== -1) {
+                    state.device[index] = { ...state.device[index], ...updated };
+                }
+            });
+        },
+        addDevice(state, newDevice) {
+            state.device.push(newDevice);
+        },
     },
     actions: {
-        async addDevice({dispatch}, payload) {
+        async addDevice({dispatch,commit}, payload) {
             const response = await api.post('/api/device', payload);
-            dispatch("group/getAllGroup", null, { root: true });
+
+            commit('addDevice',response.data.device);
+            dispatch('group/assignDevicesToGroups',null,{root:true});
+            // dispatch("group/getAllGroup", null, { root: true });
             return response;
         },
         async getAllDevices({ commit },typeId = null) {
@@ -45,25 +65,24 @@ export default {
                 throw Error(error);
             }
         },
-        async changeStatusOfDevice({ dispatch }, { id, status,pin }) {
+        async changeStatusOfDevice({ dispatch,commit }, { id, status,pin }) {
             try {
                 const response = await api.get(`/api/device/status/${id}?status=${Number(status)}&pin=${pin}`);
-                // Da li ovo moze drugacije da se resi????
-                await dispatch("group/getAllGroup", null, { root: true });
-                await dispatch("getAllDevices");
+                commit("updateDevice",response.data);
+                dispatch('group/assignDevicesToGroups',null,{root:true});
                 return response;
             }
             catch (error) {
                 throw Error(error);
-
             }
 
         },
-        async changeStautsOfDeviceInGroup({ dispatch }, { id, status,ids }) {
+        async changeStautsOfDeviceInGroup({ dispatch,commit }, { id, status,ids }) {
             try {
-                const response = await api.patch(`/api/device/group/${id}`, { status,ids });
-                await dispatch("group/getAllGroup", null, { root: true });
-                await dispatch("getAllDevices");
+                const response = await api.patch(`/api/device/group/${id}`,{ status,ids });
+                const updatedDevices = response.data.devices;
+                commit("updateDevices", updatedDevices);
+                dispatch('group/assignDevicesToGroups',null,{root:true});
                 return response;
             }
             catch (error) {
@@ -80,8 +99,8 @@ export default {
             try {
 
                 const response = await api.patch(`/api/device/name/${id}`, { name });
-                await dispatch("group/getAllGroup", null, { root: true });
                 await dispatch("getAllDevices");
+                await dispatch('group/assignDevicesToGroups',null,{root:true});
                 return response;
             }
             catch (error) {

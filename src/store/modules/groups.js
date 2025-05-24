@@ -11,21 +11,26 @@ export default {
         getAllGroups(state) {
             return state.groups;
         },
-        getAllFilterGroup: (state) => (id) => {
+        getAllFilterGroup: (state,getters, rootState, rootGetters) => (id) => {
+            const allDevices = rootGetters['device/getAllDevices'];
             // Ovde u memoriji filtriramo grupe sa odredjenim id-jevima kategorija za uredjaje!
             if (!state.groups || state.groups.length === 0) {
                 return []; 
             }
-            return state.groups
-            .map(group => {
-                const filteredDevices = group.devices.filter(device => device.id_category === parseInt(id));
-                if (filteredDevices.length > 0) {
-                    //Ovako gazim devices propery u group objektu!
-                    return { ...group, devices: filteredDevices };
-                }
-                return null;
-            })
-            .filter(group => group !== null);
+            if(allDevices) {
+                return state.groups
+                    .map(group => {
+                        const filteredDevices = allDevices.filter(device =>
+                            device.id_category === parseInt(id) && device.groups.some(g => g.id === group.id)
+                        );
+                        if (filteredDevices.length > 0) {
+                            //Ovako gazim devices propery u group objektu!
+                            return {...group, devices: filteredDevices};
+                        }
+                        return null;
+                    })
+                    .filter(group => group !== null);
+            }
         },
         getAllDevicesOfGroup: (state) => (idGroup) => {
             const groups = state.groups.find((x) => x.id === idGroup);
@@ -44,23 +49,32 @@ export default {
         },
         updateGroupsOrder(state,newOrder){
             state.groups = newOrder;
+        },
+        removeGroupById(state, id) {
+            state.groups = state.groups.filter(group => group.id !== id);
+        },
+        addGroup(state, newGroup) {
+            state.groups.push(newGroup);
+        },
+        updateGroupName(state, updatedGroup) {
+            const group = state.groups.find(g => g.id === updatedGroup.id);
+            if (group) {
+                group.name = updatedGroup.name;
+            }
         }
     },
     actions: {
-        async addGroup({ dispatch }, payload) {
+        async addGroup({ dispatch,commit }, payload) {
             try {
                 const response = await api.post('/api/groups', payload, {
                     validateStatus: (status) => status < 300
                 });
-                dispatch('getAllGroup');
-                // commit('setUser',response.data.user);
-                // commit('setJwtToken',response.data.token);
+                commit('addGroup',response.data.group);
                 return response;
             }
             catch (error) {
                 throw Error(error.response.data.message);
             }
-            // commit('setUser',user);
         },
         async getAllGroup({commit,dispatch }, id = null) {
             try {
@@ -68,6 +82,7 @@ export default {
                 if (id == null) {
                     response = await api.get('/api/groups');
                     commit('setGroups', response.data.groups);
+                    dispatch('assignDevicesToGroups');
                     dispatch('filteringOrderInNewGroups',response.data.groups);
                 }
                 else {
@@ -81,6 +96,18 @@ export default {
             catch (error) {
                 throw Error(error.response.data.message);
             }
+        },
+        async assignDevicesToGroups({ rootState, commit }) {
+            const groups = rootState.group.groups;
+            const allDevices = rootState.device.device;
+            const enrichedGroups = groups.map(group => {
+                return {
+                    ...group,
+                    devices: (allDevices && allDevices.length) ? allDevices.filter(device =>  device.groups && device.groups.some(g => g.id === group.id)): null
+                };
+            });
+            console.log(enrichedGroups);
+            commit('setGroups', enrichedGroups);
         },
         async setLocalItemFromIndexedDb({commit},payload){
             await setItem('localItems',payload);
@@ -107,27 +134,29 @@ export default {
             // console.log(id,{ids});
             try {
                 const response = await api.post(`/api/groups/${id}`, { ids });
-                dispatch('getAllGroup');
+                await dispatch('device/getAllDevices', null, { root: true });
+                await dispatch('assignDevicesToGroups');
                 return response.data;
             }
             catch (error) {
                 throw Error(error.response.data.message);
             }
         },
-        async RemoveGroup({ dispatch }, id) {
+        async RemoveGroup({ dispatch,commit }, id) {
             try {
                 const response = await api.delete(`/api/groups/${id}`);
-                dispatch('getAllGroup');
+                commit('removeGroupById',id);
+                dispatch('assignDevicesToGroups');
                 return response.data;
             }
             catch (error) {
                 throw Error(error.response.data.message);
             }
         },
-        async changeGroupName({dispatch},payload){
+        async changeGroupName({commit},payload){
             try {
                 const response = await api.patch(`/api/group/${payload.id}`, {"name": payload.name});
-                dispatch('getAllGroup');
+                commit('updateGroupName',response.data);
                 return response
             }
             catch (error) {

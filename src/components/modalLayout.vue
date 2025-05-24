@@ -34,7 +34,7 @@
           <section v-if="hasMultipleSteps && hasValidatingSteps" class="modal-footer">
 
             <ButtonMy v-if="hasPrevious()" @click="previousStep" :disabled="!hasPrevious()">Prethodni korak</ButtonMy>
-            <ButtonMy v-if="hasNext()" @click="nextStep">Sledece</ButtonMy>
+            <ButtonMy v-if="hasNext()" @click="nextStep">Sledeće</ButtonMy>
             <ButtonMy v-else @click="finishAll">Zavrsi</ButtonMy>
 
           </section>

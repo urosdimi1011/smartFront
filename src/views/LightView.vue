@@ -9,14 +9,14 @@
         <ProgressSpinner/>
       </div>
       <div v-if="groups && groups.length === 0">
-        <h3 class="header-text">Nemate uredjaje</h3>
+        <h3 class="header-text">Nemate grupe u kojima su uređaji <strong>Rasveta</strong></h3>
       </div>
     </div>
     
   </div>
 </template>
 <script setup>
-import {computed, onMounted, defineProps, provide, onDeactivated} from 'vue';
+import {computed, defineProps, provide, onDeactivated} from 'vue';
 import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
 import groupItems from '@/components/layout/GroupItems.vue';
@@ -32,23 +32,10 @@ const props = defineProps({
 })
 provide('idCategory',props.idCategories);
 
-async function fetchItems() {
-  try{
-    await store.dispatch('group/getAllGroup');
-  }
-  catch(error){
-    toast.error(error, {
-        timeout: 3000
-      });
-  }
-}
 const groups = computed(()=>{
   return store.state.group.groups != null ? store.getters['group/getAllFilterGroup'](props.idCategories) : null;
 })
 
-onMounted(() => {
-  fetchItems();
-});
 onDeactivated(()=>{
   groups.value = null;
 })

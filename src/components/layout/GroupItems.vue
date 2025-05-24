@@ -4,7 +4,8 @@
             <div class="header-group-content">
               <div class="remove-group-block">
                 <button v-if="showButtonOfTurnAll"  @click="confirmDelete()"  class="remove-group close-button">X</button>
-                <ButtonMy @click.stop="!doesDeviceOutOfRange ? turnOnAllDebounced($event) : showTooltip = !showTooltip" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
+<!--                @click.stop="!doesDeviceOutOfRange ? turnOnAllDebounced($event) : showTooltip = !showTooltip"-->
+                <ButtonMy @click.stop="turnOnAllDebounced($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
                   <PhCheck v-if="devicesAllTurn" :size="32" />
                   <PhPower v-else :size="32" />
                 </ButtonMy>
@@ -23,12 +24,12 @@
                     @keyup.enter="changeGroupName"
                     @keyup.esc="changeGroupNameFunc"
                 />
-                <button @click="changeGroupName" class="confirm-btn"><PhCheckSquare :size="23" weight="thin" /></button>
-                <button @click="changeGroupNameFunc" class="cancel-btn"><PhXSquare :size="23" weight="light" /></button>
+                <button @click="changeGroupName" class="confirm-btn"><PhCheckSquare :size="25" weight="thin" /></button>
+                <button @click="changeGroupNameFunc" class="cancel-btn"><PhXSquare :size="25" weight="light" /></button>
               </div>
 
               <info-tooltip class="customToolTip" v-if="doesDeviceOutOfRange && showTooltip" @close="changeDisplayOfTooltip">
-                <p>Tretnutno ne mozežete da upalite ili ugasite uređaje, verovatno su neki ili svi van mreže</p>
+                <p>Tretnutno ne možete da upalite ili ugasite uređaje, verovatno su neki ili svi van mreže</p>
               </info-tooltip>
 
             </div>
@@ -42,7 +43,7 @@
             <transition name="slidedown" mode="out-in">
                 <div v-if="showMenuProp || automaticOpen" class="slide-menu main">
                     <template v-if="devices && devices.length > 0">
-                        <item-block v-for="item in devices" :key="item.id" :data="item" v-memo="[item.status]">
+                        <item-block v-for="item in devices" :key="item.id" :data="item" v-memo="[item.status,item.name]">
                         </item-block>
                     </template>
                     <template v-if="devices && devices.length === 0">
@@ -64,7 +65,7 @@
                 <!-- Vidi da li moze da se ovo bolje odradi! -->
                 <SelectingFormView :textOnButtons="textOnButton" :showModals="showModals" v-if="activeForms === ''" @changeForms="setNewForms" />
                 <DeviceForm :idGrupe="id" v-if="activeForms === 'newDevice'" />
-                <DeviceFormCheckBox :idGrupe="id" stepForm="true" v-if="activeForms === 'addDevice'"
+                <DeviceFormCheckBox :idGrupe="id" stepForm v-if="activeForms === 'addDevice'"
                                     @changeForms="setNewForms" @close="closeModal()" />
               </template>
             </modal-layout>
@@ -89,7 +90,6 @@ import ProgressSpinner from 'primevue/progressspinner';
 import {PhCheck, PhPencil, PhXCircle, PhPower, PhCheckSquare, PhXSquare} from "@phosphor-icons/vue";
 import InfoTooltip from "@/components/ui/InfoTooltip.vue";
 
-// import device from '@/store/modules/device';
 
 const showMenuProp = ref(false);
 const isClass = ref(false);
@@ -98,7 +98,7 @@ let activeForms = ref('');
 const shouldTurnOn = ref(false);
 const doesChangeGroupName = ref(false);
 const titleOfModal = ref('');
-const textOnButton = ref(['Dodaj novi uredjaj','Dodaj vec postojeci uredjaj']);
+const textOnButton = ref(['Dodaj novi uredjaj','Izmeni sa već postojećim uređajima']);
 const showModals = ref(['newDevice','addDevice']);
 const toast = useToast();
 const { isOpen, show, close, modalContent, confirm } = showModal();
@@ -178,8 +178,7 @@ function turnOnAll() {
 async function turnAllDevice(){
     turnAllClassActive.value = !turnAllClassActive.value;
     try{
-      const devicesIds = mappingDevicesToIds();
-        await store.dispatch("device/changeStautsOfDeviceInGroup",{status:shouldTurnOn.value,id:props.id,ids:devicesIds});
+        await store.dispatch("device/changeStautsOfDeviceInGroup",{status:shouldTurnOn.value,id:props.id});
         toast.success('Uspesno ste promenili status uredjaja u grupi', {
             timeout: 3000
         });
@@ -189,10 +188,6 @@ async function turnAllDevice(){
             timeout: 3000
         });
     }
-}
-
-function mappingDevicesToIds(){
-  return props.devices.map((x)=>x.id);
 }
 
 function showMenu() {
@@ -277,7 +272,8 @@ const newGroupName = ref(props.groupName);
 
 .text-info {
     color: #fff;
-    font-size: 25px;
+    font-size: 15px;
+    text-align: center;
 }
 
 .remove-group {
@@ -504,7 +500,7 @@ button {
 .cancel-btn {
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
   line-height: 1;

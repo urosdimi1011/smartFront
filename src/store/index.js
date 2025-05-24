@@ -5,6 +5,7 @@ import group from './modules/groups';
 import timer from './modules/timer';
 import category from './modules/category';
 import termostat from './modules/termostat';
+import refreshAfterMutation from "@/store/plugins/refreshAfterMutation";
 export default createStore({
   modules: {
     user,
@@ -13,5 +14,6 @@ export default createStore({
     timer,
     category,
     termostat
-  }
+  },
+  plugins: [refreshAfterMutation]
 })

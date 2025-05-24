@@ -1,7 +1,9 @@
 <template>
   <div class="p-4 space-y-4">
     <template v-if="timers && timers.length > 0">
-      <div v-for="timer in timers" :key="timer.id" class="timer-row">
+      <div v-for="timer in timers" :key="timer.id" class="timer-row" :class="{timerRowFor5 : showCheckBoxForDeleteTimers}">
+
+        <div class="text-base font-medium truncate" v-if="showCheckBoxForDeleteTimers"><FormInput :value="timer.id" :id="timer.id" v-model="selectedTimers" name="timers" type="checkbox"/></div>
         <div class="text-base font-medium truncate">{{ timer.name }}</div>
         <div class="text-base font-medium truncate">{{ formatTime(timer.time) }}</div>
 
@@ -9,10 +11,19 @@
         <div class="text-right text-sm text-blue-600">
           <button @click="openDialog(timer)">Detalji</button>
         </div>
-
         <div class="flex justify-center">
           <ToggleSwitch :modelValue="Boolean(timer.active)" @update:modelValue="(val) => toggleStatus(timer, val)" />
         </div>
+      </div>
+      <div class="group-button">
+        <button-my @click="showCheckBoxForDeleteTimers ? removeTimers() : showCheckBoxForDeleting()" class="form-button">
+          {{showCheckBoxForDeleteTimers ? "Potvrdi" : "Obriši tajmere"}}
+        </button-my>
+        <template v-if="showCheckBoxForDeleteTimers">
+          <button-my @click="showCheckBoxForDeleting()" class="form-button">
+            Otkaži
+          </button-my>
+        </template>
       </div>
     </template>
     <template v-else>
@@ -86,17 +97,18 @@
             <option :value="0">Isključivanje</option>
           </select>
         </div>
-
         <!-- Dugme za čuvanje izmena -->
         <div class="pt-2 text-right">
-          <button-my v-if="editingField" @click="saveChanges" class="form-button">
-            Sačuvaj izmene
-          </button-my>
+          <div class="group-button" v-if="editingField">
+            <button-my @click="saveChanges" class="form-button">
+              Sačuvaj izmene
+            </button-my>
+            <button-my @click="stopEditing" class="form-button">
+              Poništi izmenu
+            </button-my>
+          </div>
           <button-my v-else @click="startEditing" class="form-button">
             Izmeni
-          </button-my>
-          <button-my v-if="editingField" @click="stopEditing" class="form-button">
-            Poništi izmenu
           </button-my>
         </div>
       </div>
@@ -111,14 +123,19 @@ import MultiSelect from 'primevue/multiselect';
 import Dialog from 'primevue/dialog';
 import store from '@/store';
 import { useToast } from 'vue-toastification';
+import FormInput from "@/components/ui/FormInput.vue";
 
 const dialogVisible = ref(false);
 const selectedTimer = ref(null);
 const editedTimer = ref(null);
 const editingField = ref(false);
+const showCheckBoxForDeleteTimers = ref(false);
 const toast = useToast();
 const selectedDayIds = ref([]);
 const selectedDevicesIds = ref([]);
+const selectedTimers = ref([]);
+const isDeleting = ref(false);
+
 const timers = computed(() => store.getters['timer/getListOfTimer']);
 const availableDevices = computed(() => store.getters['device/getAllDevices'] || []);
 const availableDays = ref([
@@ -143,7 +160,29 @@ const getAllTimers = async () => {
     toast.error(error.message);
   }
 };
-
+const showCheckBoxForDeleting = ()=>{
+  showCheckBoxForDeleteTimers.value = !showCheckBoxForDeleteTimers.value;
+}
+const removeTimers = async ()=>{
+  if(isDeleting.value) return;
+  if (!selectedTimers.value.length) {
+    toast.error("Prvo izaberite tajmere koje želite da obrišete", { timeout: 2000 });
+    return;
+  }
+  isDeleting.value = true;
+  try{
+    await store.dispatch("timer/deleteTimers",selectedTimers.value)
+    toast.success("Uspesno se obrisali tajmera",{timeout:2000});
+    selectedTimers.value = [];
+  }
+  catch (error){
+    toast.error(error.message,{timeout:2000});
+  }
+  finally {
+    showCheckBoxForDeleteTimers.value = false;
+    isDeleting.value = false;
+  }
+}
 const getDevices = async () => {
   try {
     await store.dispatch('device/getAll');
@@ -212,12 +251,12 @@ const saveChanges = async () => {
       idsDevice: selectedDevicesIds.value,
       idsDays: selectedDayIds.value
     };
-    const response = await store.dispatch("timer/changeTimer", updated);
+    await store.dispatch("timer/changeTimer", updated);
     toast.success("Izmene su sačuvane!");
     await getAllTimers();
     dialogVisible.value = false;
   } catch (error) {
-    toast.error("Greška pri čuvanju izmena.");
+    toast.error(error.message || "Greška pri čuvanju izmena.");
   }
 };
 </script>
@@ -231,6 +270,9 @@ const saveChanges = async () => {
   padding: 12px;
   border-bottom: 1px solid #e5e7eb;
   transition: background-color 0.2s ease;
+}
+.timerRowFor5{
+  grid-template-columns: repeat(5, 1fr) !important;
 }
 .timer-row:hover {
   background-color: #f9fafb;
@@ -250,5 +292,12 @@ const saveChanges = async () => {
 .w-moj{
   margin-top: 0.5rem;
   width: 100%;
+}
+.group-button{
+  display: flex;
+  gap:1rem;
+}
+.group-button button{
+  align-self: center;
 }
 </style>

@@ -8,7 +8,7 @@
             <FormInput v-model="checkedCategory" label="Izaberite kategoriju uredjaja" type="radio"
                 :options="allCategories" id="id_category" name="id_category" />
             <template v-if="checkedCategory === 1">
-              <label>Da li vaš uređaj podržava brightness? </label>
+              <label>Da li vaš uređaj podržava dimming? </label>
               <ToggleButton name="hasBrightness" v-model="hasBrightness" size="large" onLabel="Da" offLabel="Ne" />
             </template>
             <div v-if="idGrupe">
@@ -21,7 +21,6 @@
                     <FormInput id="board" name="board" label="Board" :model-value="randomNumber" />
                 </div>
             </transition>
-          <ButtonMy @click="openWiFiSettings">Otvori WiFi podešavanja</ButtonMy>
           <ButtonMy class="form-button">
              <span v-if="loadingSpinner">
                 <ProgressSpinner />
@@ -31,15 +30,11 @@
             </span>
           </ButtonMy>
             <p v-if="errorMsg">{{ errorMsg }}</p>
-
-<!--          <knob-block></knob-block>-->
-
         </Form>
     </div>
     <div v-else>
         <p>Da li ste se povezali na wi-fi smartera?</p>
         <ButtonMy @click="showLink()">Da </ButtonMy>
-
     </div>
 
 </template>
@@ -51,7 +46,6 @@ import FormInput from '../../components/ui/FormInput.vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useStore } from 'vuex';
 import ButtonMy from '@/components/ui/ButtonMy.vue';
-// import KnobBlock from "@/components/layout/KnobBlock.vue";
 import ToggleButton from "primevue/togglebutton";
 
 const store = useStore();
@@ -107,6 +101,7 @@ const submit = async (values) => {
     }
     catch (poruka) {
         errorMsg.value = poruka;
+        loadingSpinner.value = false;
     }
 }
 
@@ -116,21 +111,6 @@ const showAdvancedSettings = () => {
 const showLink = () => {
     window.location.href = tempLink.value;
 }
-
-const  openWiFiSettings = ()=> {
-  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-  if (/android/i.test(userAgent)) {
-    // Ako je Android, otvori WiFi podešavanja
-    window.location.href = "intent://#Intent;action=android.settings.WIFI_SETTINGS;end;";
-  } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-    // Ako je iOS, otvori WiFi podešavanja (možda ograničeno)
-    window.location.href = "prefs:root=WIFI";
-  } else {
-    alert("Vaš uređaj ne podržava automatsko otvaranje WiFi podešavanja.");
-  }
-}
-
 </script>
 <style scoped>
 span {
@@ -139,7 +119,7 @@ span {
     color: rgba(255, 0, 0, 0.9);
 }
 .w-30{
-    width: 50%;
+    width: 100%;
 }
 input,
 button {
@@ -154,13 +134,13 @@ input {
 }
 
 .form-button {
-    color: black;
-    //border: 1px solid black;
     padding: 5px 10px;
     width: 100%;
     margin-top: 25px;
 }
-
+.form-button span{
+  color:#fff;
+}
 .form-group label {
     display: block;
     font-size: 20px;

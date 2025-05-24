@@ -52,7 +52,7 @@ import DeviceForm from '@/features/devices/DeviceForm.vue';
 import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
 import ProgressSpinner from 'primevue/progressspinner';
-import {setItem} from "@/config/indexedDB";
+import {deepToRaw, setItem} from "@/config/indexedDB";
 
 const groups = computed(()=>{
     return store.getters['group/getAllGroups'];
@@ -61,8 +61,8 @@ const groups = computed(()=>{
 
 onMounted(async () => {
   loadingSpiner.value = true;
+  // await store.dispatch("group/assignDevicesToGroups", null, { root: true });
 
-  await fetchItems();
   localItems.value = groups.value;
   loadingSpiner.value = false;
 });
@@ -78,7 +78,7 @@ defineOptions({
 
 const onEnd = async () => {
   //Ovaj podatak upisujemo u indexedDB!!
-  const rawItems = toRaw(localItems.value.map(item => toRaw(item)));
+  const rawItems = deepToRaw(localItems.value);
   await setItem('localItems',rawItems);
   store.commit('group/updateGroupsOrder', localItems.value);
 };
@@ -107,20 +107,20 @@ const showModalDevice = (which) => {
   show();
 }
 
-async function fetchItems() {
-  // Simulacija dohvatanja podataka
-  //dohvatanje svih uredjaja !
-  //Ovo ne znam da li treba da bude ovde!??
-  try{
-    await store.dispatch('group/getAllGroup');
-    await store.dispatch('device/getAllDevices');
-  }
-  catch(error){
-    toast.error(error, {
-        timeout: 3000
-      });
-  }
-}
+// async function fetchItems() {
+//   // Simulacija dohvatanja podataka
+//   //dohvatanje svih uredjaja !
+//   //Ovo ne znam da li treba da bude ovde!??
+//   try{
+//     await store.dispatch('group/getAllGroup');
+//     await store.dispatch('device/getAllDevices');
+//   }
+//   catch(error){
+//     toast.error(error, {
+//         timeout: 3000
+//       });
+//   }
+// }
 // const groupsAll = computed(()=>{
 //   return store.state.group.groups != null ? store.getters['group/getAllGroups'] : null;
 // })

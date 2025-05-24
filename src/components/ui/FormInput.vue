@@ -25,7 +25,8 @@
                 v-bind="field"
                 :inputId="id"
                 :name="name"
-                binary
+                :value="(componentOptions && componentOptions.isBinary) ? undefined : id"
+                :binary="componentOptions && componentOptions.isBinary"
             />
           </Field>
         </div>
@@ -79,6 +80,10 @@
       options: {
           type: Array,
           required: false
+      },
+      componentOptions : {
+        type : Object,
+        required : false
       }
   });
   defineOptions({

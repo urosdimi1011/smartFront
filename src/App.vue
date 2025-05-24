@@ -40,26 +40,16 @@
           <Skeleton size="3rem"></Skeleton>
           <Skeleton size="3rem"></Skeleton>
         </template>
-
-        <!-- <label for="light" :class="{ 'active-tab': isActive('/light') }"><i class="fa-regular fa-lightbulb"></i></label>
-        <label for="temperature" :class="{ 'active-tab': isActive('/temperature') }">
-          <i class="fa-solid fa-plug"></i>
-        </label> -->
-        <!-- <i class="fa-solid fa-gear"></i></label> -->
-        <!-- <div class="underline"></div> -->
       </div>
     </div>
 
     <div class="main-moj container">
-      <router-view v-slot="{ Component }" :key="$route.fullPath">
-        <transition name="slide" mode="out-in">
-          <component :is="Component" v-if="Component" />
-        </transition>
-      </router-view>
-
+      <transition :name="transitionName" mode="out-in" >
+        <router-view :key="$route.path" v-slot="{ Component }">
+          <component :is="Component" class="view" />
+        </router-view>
+      </transition>
     </div>
-
-
 
     <div class="block-fixed">
       <div @click="showTimerModal()" class="lamp background-block">
@@ -93,7 +83,7 @@ import modalLayout from '@/components/modalLayout.vue';
 import TimerView from '@/views/TimerView.vue';
 import OfflineView from '@/views/OfflineView.vue';
 import { showModal } from '@/composables/modal';
-import { shallowRef, ref, onMounted, computed,onUnmounted } from 'vue';
+import {shallowRef, ref, onMounted, computed, onUnmounted, watch} from 'vue';
 import TimerTable from './components/layout/TimerTable.vue';
 import Skeleton from 'primevue/skeleton';
 const { isOpen, show, close } = showModal();
@@ -101,20 +91,17 @@ import store from '@/store';
 import UserView from './views/UserView.vue';
 import {PhAlarm, PhUser} from "@phosphor-icons/vue";
 import MobileTimerView from "@/components/ui/MobileTimerView.vue";
+import {useToast} from "vue-toastification";
 
-
+const toast = useToast();
+const stepIndex = ref(0);
+const route = useRoute();
+const router = useRouter();
 const components = shallowRef([
     { component: TimerView, props: { title : "Dodajte tajmer" } },
     { component: TimerTable, props: { width: "1300px",title : "Pregled tajmera" } }
 ]);
 
-const stepIndex = ref(0);
-const route = useRoute();
-const router = useRouter();
-// const categories = ref(null);
-// const showAnother = ()=>{
-//   stepIndex.value++;
-// }
 const isOnline = ref(navigator.onLine); // Trenutni status interneta
 const isOfflinePending = ref(false); // Flag za praćenje odlaganja offline moda
 let offlineTimeout = null; // Reference za timeout funkciju
@@ -126,7 +113,6 @@ const updateOnlineStatus = () => {
     isOfflinePending.value = false; // Resetuj odlaganje offline moda
     clearTimeout(offlineTimeout); // Ukloni aktivan timeout ako postoji
   } else {
-    // Ako je offline, započni odlaganje od 2 minuta
     isOfflinePending.value = true;
     offlineTimeout = setTimeout(() => {
       isOnline.value = false; // Postavi status na offline tek nakon 2 minuta
@@ -166,12 +152,33 @@ function showTimerModal() {
   show();
 }
 
+
+
+async function fetchItems() {
+  // Simulacija dohvatanja podataka
+  //dohvatanje svih uredjaja !
+  //Ovo ne znam da li treba da bude ovde!??
+  try{
+    await store.dispatch('group/getAllGroup');
+    await store.dispatch('device/getAllDevices');
+    await store.dispatch("group/assignDevicesToGroups", null, { root: true });
+
+  }
+  catch(error){
+    toast.error(error, {
+      timeout: 3000
+    });
+  }
+}
+
+
 const showUserModal = () => {
   components.value = [{ component: UserView,props: {title : 'Korisnički profil'} }];
   show();
 }
-onMounted(() => {
+onMounted(async () => {
   getAllCategories();
+  await fetchItems();
   window.addEventListener("online", updateOnlineStatus);
   window.addEventListener("offline", updateOnlineStatus);
 })
@@ -207,9 +214,26 @@ const prevPage = () => {
     router.push('/');
   }
 }
+const routeOrder = {
+  '/': 0,
+  '/light/1': 1,
+  '/plug/2': 2,
+  '/temperature': 3
+};
+const transitionName = ref('slide-left');
+let previousIndex = routeOrder[route.path] ?? 0
 
+watch(() => route.path, (newPath, oldPath) => {
+  const newIndex = routeOrder[newPath] ?? 0;
 
+  if (newIndex > previousIndex) {
+    transitionName.value = 'slide-left'
+  } else {
+    transitionName.value = 'slide-right'
+  }
 
+  previousIndex = newIndex;
+});
 
 
 </script>
@@ -226,7 +250,9 @@ const prevPage = () => {
 a {
   text-decoration: none;
 }
-
+.no-scroll-x {
+  overflow-x: hidden !important;
+}
 input:focus {
   touch-action: manipulation;
 }
@@ -338,9 +364,8 @@ input:focus {
   will-change: filter;
 }
 
-.lamp.active i:not(:last-child),
-.lamp.active svg {
-  filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff) drop-shadow(0 0 30px #fff) drop-shadow(0 0 80px #fff);
+.lamp.active i:not(:last-child){
+  filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #fff);
   will-change: filter;
 }
 
@@ -353,7 +378,7 @@ input:focus {
   width: 20%;
   border-radius: 5px;
   text-align: center;
-  padding: 20px 0px 7px 0px;
+  padding-top: 20px;
   cursor: pointer;
   transition: all 300ms;
   border: 1px solid transparent;
@@ -363,14 +388,48 @@ input:focus {
   position:relative;
 }
 
-.slide-enter-active, .slide-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+/* LEFT transition (napred) */
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: transform 0.3s ease;
 }
-.slide-enter-from, .slide-leave-to {
-  opacity: 0;
-  transform: translateX(20px);
+.slide-left-enter-from {
+  transform: translateX(100%);
+}
+.slide-left-enter-to {
+  transform: translateX(0%);
+}
+.slide-left-leave-from {
+  transform: translateX(0%);
+}
+.slide-left-leave-to {
+  transform: translateX(-100%);
 }
 
+/* RIGHT transition (nazad) */
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-right-enter-from {
+  transform: translateX(-100%);
+}
+.slide-right-enter-to {
+  transform: translateX(0%);
+}
+.slide-right-leave-from {
+  transform: translateX(0%);
+}
+.slide-right-leave-to {
+  transform: translateX(100%);
+}
+
+/* Parent container mora imati relative pozicioniranje */
+.container {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
 .lamp h2 {
   margin-bottom: 40px;
 }
@@ -834,13 +893,10 @@ button:active {
 .main {
   display: flex;
   justify-content: center;
-  margin-top: 29px;
+  margin-top: 6px;
   gap: 20px;
   flex-wrap: wrap;
 }
-
-
-
 /* Za stranice */
 
 
@@ -905,6 +961,12 @@ button:active {
     height: 470px;
     left: 53%;
   }
+  .content-conf button{
+    padding: 4px 8px !important;
+  }
+  .header-text{
+    font-size:1.5rem !important;
+  }
   .remove-group{
     font-size: 20px !important;
   }
@@ -926,8 +988,8 @@ button:active {
   .group-content{
     width: 95%;
   }
-  .modal-content{
-    width: auto !important;
+  .modal-content {
+    width: 90vw !important;
   }
   .modal-header{
     font-size: 13px !important;
@@ -970,27 +1032,11 @@ button:active {
   }
   input{
     font-size:1rem !important;
-    padding: 8px ;
+    padding: 8px;
   }
   .arrowPravi{
     width: 100% !important;
     height: 100% !important;
-  }
-  .login-background{
-    //height: 300vh;
-  }
-  .container{
-    //height: 250vh;
-    //max-height: 400vh;
-  }
-}
-
-@media only screen and (max-width: 400px) {
-  .error-msg,.form-group span{
-    font-size:14px !important;
-  }
-  .modal-content{
-    width:90vw !important;
   }
   .activeAll{
     width: 7vw !important;
@@ -1003,6 +1049,15 @@ button:active {
     right:10px !important;
     padding: 2px 3px !important;
     margin-right: 0px !important;
+  }
+  .down-group-items i{
+    font-size: 1rem !important;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .error-msg,.form-group span{
+    font-size:14px !important;
   }
   .customToolTip{
     top:-45px !important;
@@ -1093,10 +1148,6 @@ button:active {
   .login-background{
     padding-top: 60px !important;
   }
-  .down-group-items i{
-    padding: 8px 0px !important;
-    font-size: 18px !important;
-  }
   .underline::after {
     width: 50%;
     right:0;
@@ -1172,7 +1223,7 @@ button:active {
 .header-text {
   text-align: center;
   font-size: 30px;
-  color: white;
+  color: #fff;
 }
 
 </style>

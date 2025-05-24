@@ -2,51 +2,55 @@
 <!--  !data.is_out_of_range ? toggleActive() : null-->
 <!--  offline : data.is_out_of_range-->
   <template v-if="!data.is_out_of_range">
-    <div @click.stop=" toggleActive()" :data-id="data.id" class="lamp background-block" :class="{active: active}">
-      <info-tooltip :text="printTextFotTooltip()"></info-tooltip>
-      <div class="content-up">
-        <div>
-          <template v-if="data.category.name === 'Plug' && data.status === 0">
-            <PhPlugs :size="48" />
-          </template>
-          <template v-if="data.category.name === 'Plug' && data.status">
-            <PhPlugsConnected :size="48" />
-          </template>
-          <template v-if="data.category.name !== 'Plug'">
-            <i :class="data.category.icon"></i>
-          </template>
-          <div v-if="showInputField" class="name-block">
-            <p>{{ data.name }}</p>
-          </div>
-          <div @click.stop v-if="!showInputField" class="form-change-input">
-            <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
-            <ButtonMy class="color-button" @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
-          </div>
-          <!--           v-if="data.is_out_of_range"-->
-          <div v-if="!data.is_out_of_range" class="outOfRange">
-            <p>Uredjaj je van mreže</p>
-            <p><PhWifiX :size="32" /></p>
+    <div @click.stop="!data.is_out_of_range ? toggleActive() : null" :data-id="data.id" class="lamp background-block" :class="{active: active,isToggling : isToggling,offline : data.is_out_of_range}">
+      <div>
+        <info-tooltip>
+          <ul>
+            <li>Board uredjaja: <strong>{{data.board}}</strong></li>
+            <li>Pin uredjaja: <strong>{{data.pin}}</strong></li>
+          </ul>
+        </info-tooltip>
+        <div class="content-up" >
+          <ProgressSpinner v-if="isToggling" style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
+                           animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+          <div v-else>
+            <template v-if="data.category.name === 'Plug' && data.status === 0">
+              <PhPlugs :size="48" />
+            </template>
+            <template v-if="data.category.name === 'Plug' && data.status">
+              <PhPlugsConnected :size="48" />
+            </template>
+            <template v-if="data.category.name !== 'Plug'">
+              <i :class="data.category.icon"></i>
+            </template>
+            <div v-if="showInputField" class="name-block">
+              <p>{{ data.name }}</p>
+
+            </div>
+            <div @click.stop v-if="!showInputField" class="form-change-input">
+              <input type="text" id="nameOfDevice" :value="data.name" @input="onInputChange" />
+              <ButtonMy class="color-button" @click.stop="changeName()"><i class="fa-solid fa-check"></i></ButtonMy>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="content-down">
-        <!-- <hr class="line"/> -->
-        <button class="down-button" @click.stop="showAdcConf()"><i :class="{ rotate: doShowAdcConf }"
-                                                                   class="fa-solid fa-arrow-down"></i></button>
-        <transition name="slidedown" mode="out-in">
-          <div @click.stop v-if="doShowAdcConf" class="content-conf">
-            <button @click.stop="removeDevice()">
-              <span><i class="fa-solid fa-trash"></i></span>
-            </button>
-            <button @click.stop="changeNameOfInput()">
-              <span><i class="fa-solid fa-pencil"></i></span>
-            </button>
-            <button @click.stop="showConfigModal()" v-if="data.hasBrightness">
-              <span><i class="fa-solid fa-gear"></i></span>
-
-            </button>
-          </div>
-        </transition>
+        <div class="content-down">
+          <!-- <hr class="line"/> -->
+          <button class="down-button" @click.stop="showAdcConf()"><i :class="{ rotate: doShowAdcConf }"
+                                                                     class="fa-solid fa-arrow-down"></i></button>
+          <transition name="slidedown" mode="out-in">
+            <div @click.stop v-if="doShowAdcConf" class="content-conf">
+              <button @click.stop="removeDevice()">
+                <p><PhTrash :size="25" /></p>
+              </button>
+              <button @click.stop="changeNameOfInput()">
+                <p><PhPencil :size="25" /></p>
+              </button>
+              <button @click.stop="showConfigModal()" v-if="data.hasBrightness">
+                <span><i class="fa-solid fa-gear"></i></span>
+              </button>
+            </div>
+          </transition>
+        </div>
       </div>
       <Teleport to="body">
         <modal-layout :title="titleOfModal" :props="defineMyProps" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
@@ -55,14 +59,18 @@
     </div>
   </template>
   <template v-else>
-    <div class="offline lamp background-block">
-      <info-tooltip :text="printTextFotTooltip()"></info-tooltip>
+    <div class="offline lamp backgr ound-block">
+      <info-tooltip>
+        <ul>
+          <li>Board uredjaja: <strong>{{data.board}}</strong></li>
+          <li>Pin uredjaja: <strong>{{data.pin}}</strong></li>
+        </ul>
+      </info-tooltip>
       <div class="content-up">
         <div>
-          <!--           v-if="data.is_out_of_range"-->
           <div class="outOfRange">
             <p>Uredjaj <strong>{{ data.name }}</strong> je van mreže</p>
-            <p>Vreme: {{ formatDate(data.updated_date) }}</p>
+            <p>Vreme: {{ formatDateUTC(data.updated_date) }}</p>
             <p><PhWifiX :size="32" /></p>
           </div>
         </div>
@@ -74,7 +82,8 @@
 import {ref, defineProps, defineOptions,computed} from 'vue';
 import modalLayout from '../modalLayout.vue';
 import { showModal } from '../../composables/modal';
-import { PhPlugs, PhPlugsConnected,PhWifiX } from "@phosphor-icons/vue";
+import {ProgressSpinner} from 'primevue';
+import { PhPlugs, PhPlugsConnected,PhWifiX,PhTrash,PhPencil } from "@phosphor-icons/vue";
 defineOptions({ memo: true });
 const { isOpen, show, close, confirm, modalContent } = showModal();
 // Ovo je globalan objekat sa podacima
@@ -96,33 +105,43 @@ const showInputField = ref(true);
 const doShowAdcConf = ref(false);
 const defineMyProps = ref([]);
 const titleOfModal = ref("");
+const isToggling = ref(false);
+
 //Promena statusa uredjaju
 async function toggleActive() {
     // Ovde treba da se prosledi dispathc za promenu statusa device!
+    if (isToggling.value) return;
+
+    isToggling.value = true;
     try {
-      //Promena
+
         const data = {
             status: !active.value,
             id: props.data.board,
             pin : props.data.pin
         };
+        console.log(data)
         await store.dispatch('device/changeStatusOfDevice', data);
         // active.value = props.data.status;
         toast.success("Uspesno ste promeni status uredjaju", { timeout: 3000 });
     }
     catch (error) {
+      console.log(error);
         toast.error(error.message, { timeout: 3000 });
+    }
+    finally {
+      isToggling.value = false;
     }
 
 }
 
 const tempName = ref(props.data.name);
-const printTextFotTooltip = ()=>{
-  return `<ul>
-    <li>Board uredjaja: <strong>${props.data.board}</strong></li>
-    <li>Pin uredjaja: <strong>${props.data.pin}</strong></li>
-</ul>`
-}
+// const printTextFotTooltip = ()=>{
+//   return `<ul>
+//     <li>Board uredjaja: <strong>${props.data.board}</strong></li>
+//     <li>Pin uredjaja: <strong>${props.data.pin}</strong></li>
+// </ul>`
+// }
 const removeDevice = () => {
   titleOfModal.value = "Potvrda";
   show(`Da li ste sigurni da zelite da obrisete uredjaj ${props.data.name}`, deleteDevice);
@@ -168,15 +187,15 @@ async function changeName() {
     }
 }
 
-const formatDate = (dateString) => {
+const formatDateUTC = (dateString) => {
   const date = new Date(dateString);
-  const dan = String(date.getDate()).padStart(2, '0');
-  const mesec = String(date.getMonth() + 1).padStart(2, '0');
-  const godina = date.getFullYear();
-  const sati = String(date.getHours()).padStart(2, '0');
-  const minuti = String(date.getMinutes()).padStart(2, '0');
-  return `${dan}.${mesec}.${godina}. ${sati}:${minuti}`;
-}
+  const dan = String(date.getUTCDate()).padStart(2, '0');
+  const mesec = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const godina = date.getUTCFullYear();
+  const sati = String(date.getUTCHours()).padStart(2, '0');
+  const minuti = String(date.getUTCMinutes()).padStart(2, '0');
+  return `${dan}.${mesec}.${godina}. ${sati}:${minuti}H`;
+};
 
 
 </script>
@@ -274,7 +293,7 @@ ul{
 .down-button {
     width: 100%;
     color: black;
-    padding: 5px 0px;
+    padding: 10px 0px;
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -299,6 +318,14 @@ ul{
 }
 .active{
   border:1px solid white;
+}
+.isToggling{
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 1000;
 }
 /* .line{
     position:absolute;

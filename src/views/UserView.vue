@@ -7,10 +7,8 @@
             <li><strong>Datum izmene:</strong> {{ formattedDate(getUser.update_date) }}</li>
             <li> <button-my @click="changePassword()">Promeni lozinku</button-my> </li>
         </ul>
-        <ButtonMy @click="logout()" class="w-50">logout</ButtonMy>
-        <modal-layout  title="Promeni lozinku" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()">
-
-        </modal-layout>
+        <ButtonMy @click="logout()" class="w-50">Izloguj se</ButtonMy>
+        <modal-layout  title="Promeni lozinku" :modalContent="modalContent" :confirm="confirm" :visible="isOpen" @close="close()"/>
     </div>
 </template>
 <script setup>

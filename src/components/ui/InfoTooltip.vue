@@ -1,8 +1,11 @@
 <template>
   <div ref="wrapperRef"> <!-- Dodaj ref oko celog sadržaja -->
     <template v-if="hasSlot">
-      <div v-if="show" class="tooltip" v-bind="$attrs">
-        <slot></slot>
+      <div class="info-wrapper" @click.stop="toggleTooltip">
+        <span class="info-icon"><i class="fas fa-info-circle"></i></span>
+        <div v-if="show" class="tooltip" v-bind="$attrs">
+          <slot></slot>
+        </div>
       </div>
     </template>
     <template v-else>
@@ -19,7 +22,7 @@ defineOptions({
   inheritAttrs: false
 });
 const slots = useSlots();
-const show = ref(slots.default ? true : false);
+const show = ref(false);
 defineProps({
   text: String,
 })

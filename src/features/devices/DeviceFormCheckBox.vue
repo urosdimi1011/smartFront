@@ -1,10 +1,10 @@
 <template>
     <Form @submit="submit" :initial-values="formValues" :validation-schema="schema">
         <template v-if="deviceOptions && deviceOptions.length > 0">
-            <FormInput v-model="devices" label="Izaberite uredjaje" type="checkbox" :options="deviceOptions"
+            <FormInput v-model="devices" type="checkbox" :options="deviceOptions"
                 id="devices" name="devices" />
             <template v-if="stepForm">
-                <ButtonMy>Dodaj</ButtonMy>
+                <ButtonMy>Izmeni</ButtonMy>
             </template>
         </template>
       <template v-if="deviceOptions && deviceOptions.length === 0">
@@ -71,7 +71,6 @@ const { validate } = useForm({
 const { value: devices } = useField('devices');
 
 const deviceOptions = ref(null);
-
 defineExpose({ validate});
 
 function isValidSync(data) {
