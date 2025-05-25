@@ -2,8 +2,8 @@
   <div ref="wrapperRef"> <!-- Dodaj ref oko celog sadržaja -->
     <template v-if="hasSlot">
       <div class="info-wrapper" @click.stop="toggleTooltip">
-        <span class="info-icon"><i class="fas fa-info-circle"></i></span>
-        <div v-if="show" class="tooltip" v-bind="$attrs">
+        <span v-if="showInfoIcon" class="info-icon"><i class="fas fa-info-circle"></i></span>
+        <div v-if="automaticOpen || show" class="tooltip" v-bind="$attrs">
           <slot></slot>
         </div>
       </div>
@@ -25,6 +25,14 @@ const slots = useSlots();
 const show = ref(false);
 defineProps({
   text: String,
+  showInfoIcon : {
+    required: false,
+    default: true
+  },
+  automaticOpen : {
+    required : false,
+    default: false
+  }
 })
 const hasSlot = computed(() => !!slots.default);
 const emit = defineEmits(['close']);
@@ -88,7 +96,7 @@ ul {
   top: 5px;
   right: 0px !important;
   transform: none !important;
-  width:50% !important;
+  width:30vw;
   left: unset !important;
 }
 .customToolTip > *{

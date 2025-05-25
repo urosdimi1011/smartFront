@@ -10,6 +10,7 @@ import Button from './components/ui/ButtonMy.vue';
 import 'vue-toastification/dist/index.css';
 import './registerServiceWorker'
 import Vue3TouchEvents from 'vue3-touch-events';
+import './plugins/echo';
 
 
 // import Toast from "vue-toastification"

@@ -986,6 +986,9 @@ button:active {
     height: 470px;
     left: 53%;
   }
+  .customToolTip{
+    width: 68vw !important;
+  }
   .content-conf button{
     padding: 4px 8px !important;
   }

@@ -59,7 +59,7 @@
     </div>
   </template>
   <template v-else>
-    <div class="offline lamp backgr ound-block">
+    <div class="offline lamp background-block">
       <info-tooltip>
         <ul>
           <li>Board uredjaja: <strong>{{data.board}}</strong></li>
@@ -271,7 +271,9 @@ ul{
     border-radius: 8%;
     cursor:pointer;
 }
-
+.lamp .content-conf button p{
+  margin-top: 0px;
+}
 .content-conf button:nth-child(1) {
     background-color: red;
 }

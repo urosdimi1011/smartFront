@@ -38,7 +38,7 @@ export default {
         },
         addDevice(state, newDevice) {
             state.device.push(newDevice);
-        },
+        }
     },
     actions: {
         async addDevice({dispatch,commit}, payload) {
@@ -71,6 +71,16 @@ export default {
                 commit("updateDevice",response.data);
                 dispatch('group/assignDevicesToGroups',null,{root:true});
                 return response;
+            }
+            catch (error) {
+                throw Error(error);
+            }
+
+        },
+        async changeStatusOfDeviceWithSocket({ dispatch,commit }, device) {
+            try {
+                commit("updateDevice",device);
+                dispatch('group/assignDevicesToGroups',null,{root:true});
             }
             catch (error) {
                 throw Error(error);

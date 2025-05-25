@@ -5,7 +5,7 @@
               <div class="remove-group-block">
                 <button v-if="showButtonOfTurnAll"  @click="confirmDelete()"  class="remove-group close-button">X</button>
 <!--                @click.stop="!doesDeviceOutOfRange ? turnOnAllDebounced($event) : showTooltip = !showTooltip"-->
-                <ButtonMy @click.stop="turnOnAllDebounced($event)" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
+                <ButtonMy @click.stop="!doesDeviceOutOfRange ? turnOnAllDebounced($event) : showTooltip = !showTooltip" v-if="showButtonOfTurnAll && devices && devices.length" class="activeAll">
                   <PhCheck v-if="devicesAllTurn" :size="32" />
                   <PhPower v-else :size="32" />
                 </ButtonMy>
@@ -28,7 +28,7 @@
                 <button @click="changeGroupNameFunc" class="cancel-btn"><PhXSquare :size="25" weight="light" /></button>
               </div>
 
-              <info-tooltip class="customToolTip" v-if="doesDeviceOutOfRange && showTooltip" @close="changeDisplayOfTooltip">
+              <info-tooltip :automaticOpen="true" :showInfoIcon="false" class="customToolTip" v-if="doesDeviceOutOfRange && showTooltip" @close="changeDisplayOfTooltip">
                 <p>Tretnutno ne možete da upalite ili ugasite uređaje, verovatno su neki ili svi van mreže</p>
               </info-tooltip>
 

@@ -65,6 +65,13 @@ onMounted(async () => {
 
   localItems.value = groups.value;
   loadingSpiner.value = false;
+
+
+  // Ovde implementiram socket
+  window.Echo.channel('devices')
+      .listen('.status-updated', (e) => {
+        store.dispatch('device/changeStatusOfDeviceWithSocket',e.device);
+      });
 });
 
 const onModelUpdate = (newValue) => {
