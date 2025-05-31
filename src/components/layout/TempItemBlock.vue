@@ -2,7 +2,7 @@
   <div v-if="dataLocal.termostat" :data-id="data.id" class="lamp background-block">
     <h2>{{ dataLocal.name }}</h2>
     <div class="center">
-      <Knob readonly v-model="changedTemperature" :min="0" :max="30" :step="1" :size="200" valueColor="#4caf50"
+      <Knob v-model="changedTemperature" :min="0" :max="30"  :step="1" :size="200" valueColor="#4caf50"
         rangeColor="#e0e0e0" />
       <div class="flex gap-2">
         <Button icon="pi pi-plus" @click="changedTemperature++" :disabled="changedTemperature >= 30" />
