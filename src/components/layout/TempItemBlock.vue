@@ -143,8 +143,9 @@ const submit = async ()=>{
       'maintain_temperature': maintainTermostat.value ? 1 : 0
     }
 
+    store.commit('device/setSelectedType',selectedType.value);
     const response = await store.dispatch('device/setDataOfDeviceForTemperature',{data : dataForSend,id : dataLocal.value.id,});
-    await store.dispatch('device/getAllDevicesForTemperature',selectedType.value);
+    // await store.dispatch('device/getAllDevicesForTemperature',selectedType.value);
 
     toast.success(response.data.message,{timeout:3000});
   }

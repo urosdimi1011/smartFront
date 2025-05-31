@@ -4,7 +4,8 @@ export default {
     namespaced: true,
     state: () => ({
         device: null,
-        deviceForTemperature : null
+        deviceForTemperature : null,
+        selectedType : null
     }),
     getters: {
         getAllDevices(state) {
@@ -12,6 +13,9 @@ export default {
         },
         getDeviceOfTemperatureForSelectedType(state){
             return state.deviceForTemperature;
+        },
+        getSelectedType(state){
+            return state.selectedType;
         }
     },
     mutations: {
@@ -21,6 +25,9 @@ export default {
         },
         setDeviceForTemperature(state,payload){
             state.deviceForTemperature = payload;
+        },
+        setSelectedType(state,payload){
+          state.selectedType = payload;
         },
         updateDevice(state, updatedDevice) {
             const index = state.device.findIndex(d => d.id === updatedDevice.id);
@@ -145,8 +152,11 @@ export default {
                 throw Error(error);
             }
         },
-        async getAllDevicesForTemperature({commit},type){
+        async getAllDevicesForTemperature({commit,state},type=null){
             try {
+                if(state.selectedType != null){
+                    type = state.selectedType;
+                }
                 const response = await api.get(`/api/devicesWithTermostat?type=${type}`);
                 commit('setDeviceForTemperature',response.data.data);
                 return response;
@@ -155,10 +165,10 @@ export default {
                 throw Error(error);
             }
         },
-        async setDataOfDeviceForTemperature({commit},payload){
+        async setDataOfDeviceForTemperature({dispatch},payload){
             try {
                 const response = await api.post(`/api/setDataOfDeviceForTemperature/${payload.id}`,payload.data);
-                commit('setDeviceForTemperature',response.data.data);
+                await dispatch('getAllDevicesForTemperature');
                 return response;
             }
             catch(error){

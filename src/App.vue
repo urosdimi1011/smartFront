@@ -194,6 +194,13 @@ onMounted(async () => {
 
   window.addEventListener("online", updateOnlineStatus);
   window.addEventListener("offline", updateOnlineStatus);
+
+  // Ovde implementiram socket
+  window.Echo.channel('devices')
+      .listen('.status-updated', (e) => {
+        store.dispatch('device/changeStatusOfDeviceWithSocket',e.device);
+      });
+
 })
 
 async function loadData() {

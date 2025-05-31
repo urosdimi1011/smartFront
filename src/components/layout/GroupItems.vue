@@ -214,6 +214,10 @@ const confirmDelete = ()=>{
 }
 
 const changeGroupName = async ()=>{
+  if(props.groupName === newGroupName.value){
+    doesChangeGroupName.value = !doesChangeGroupName.value;
+    return;
+  }
   const data = {
     name : newGroupName.value,
     id: props.id

@@ -93,7 +93,6 @@ watch(devices, (newVal) => {
     if (!props.stepForm) {
         sendDataToModal(newVal);
     }
-    // emit('onSubmit',{"devices":newVal,step:2,validate:isValidSync(newVal)});
 });
 
 async function getAllDevices() {
@@ -140,7 +139,12 @@ const setDeviceOptions = (data)=>{
 
 async function submit(values) {
     if (props.stepForm) {
-        try {
+      try {
+            if(checkBeforeSending(values)){
+              console.log("UsLII");
+              emit('close');
+              return;
+            }
             const response = await store.dispatch('group/AddDevicesInGroup', { id: props.idGrupe, ...values });
              toast.success(response.message, {
                 timeout: 3000
@@ -154,10 +158,15 @@ async function submit(values) {
         emit('close');
     }
     else {
+        // Ovo ovde je za formu kada je steps;
         emit('onSubmit', { values, step: 2 });
     }
 }
-
+const checkBeforeSending = (values) => {
+  const devices = formValues.devices;
+  return values.devices.length === devices.length &&
+      values.devices.every(v => devices.includes(v));
+};
 </script>
 <style scoped>
 span {
