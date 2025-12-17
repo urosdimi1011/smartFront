@@ -23,11 +23,18 @@ import FormInput from '../../components/ui/FormInput.vue';
 const schema = yup.object({
     grupaUredjaja: yup.string().required("Morate uneti ime grupe")
 });
+
+
 const props = defineProps({
     previousValue: {
         type: Object,
         required: false,
         default: () => ({})
+    },
+    internValidation:{
+        type : Boolean,
+        required: false,
+        default : true
     }
 });
 

@@ -7,6 +7,7 @@ const routes = [
     { path: '/temperature', component: () => import('../views/TemperatureView.vue'), name: 'Temperature', meta: { requiresAuth: true }, props: true },
   { path: '/login', component: () => import('../views/LoginView.vue'), name: 'Login', props: true },
   { path: '/register', component: () => import('../views/RegisterView.vue'), name: 'Register', props: true },
+  { path: '/reset-password', component: () => import('../views/RestartPasswordView.vue'), name: 'RestartPassword', props: true },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/NotFound.vue') }
 
 ]
@@ -15,12 +16,13 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
   scrollBehavior() {
-    return { top: 0, behavior: 'smooth' }; // Vraća na vrh sa glatkim skrolovanjem
+    return { top: 0, behavior: 'smooth' };
   }
 })
 
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('token');
+  console.log(isAuthenticated);
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login');
   } else if (to.path === '/login' && isAuthenticated) {

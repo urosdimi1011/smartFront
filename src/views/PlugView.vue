@@ -1,27 +1,28 @@
-<template>
+  <template>
     <div id="LightPage" class="main page">
       <div class="group-content">
-        <div v-if="groups && groups.length > 0" id="LightPage">
-        <group-items v-for="item in groups" :key="item.id" :groupName="item.name" :id="item.id" :idDevice="item.id"
-          :devices="item.devices"></group-items>
+        <div v-if="!isLoading && groups && groups.length > 0" id="LightPage">
+        <group-items  v-for="item in groups" :key="item.id" :groupName="item.name" :id="item.id" :idDevice="item.id"
+          :devices="item.devices" :removeOption="false" ></group-items>
       </div>
-      <div v-if="groups == null" class="spinner-container">
+      <!-- <div v-if="groups == null" class="spinner-container">
         <ProgressSpinner/>
-      </div>
-      <div v-if="groups && groups.length === 0">
-        <h3 class="header-text">Nemate grupe u kojima su uređaji <strong>Plug</strong></h3>
-      </div>
-      </div>
+      </div> -->
+      <div v-if="!isLoading && groups && groups.length === 0" class="empty-state">
+        <div><Icon icon="gravity-ui:plug-connection" width="32" height="32" /></div>
+          <h3 class="empty-title">Ne postoje grupe u kojima su uređaji <strong>Plug</strong></h3>
+        </div>
+    </div>
       </div>
   </template>
   <script setup>
   import {computed, defineProps, provide} from 'vue';
   import { useStore } from 'vuex';
-  import { useToast } from 'vue-toastification';
   import groupItems from '@/components/layout/GroupItems.vue';
   import ProgressSpinner from 'primevue/progressspinner';
+  import { Icon } from '@iconify/vue';
   const store = useStore();
-  const toast = useToast();
+  // const toast = useToast
   const props = defineProps({
     idCategories: {
       type: [Number, String],
@@ -29,14 +30,63 @@
     }
   })
   provide('idCategory',props.idCategories);
+
+  const isLoading = computed(() => {
+    return store.getters['device/isLoading'] || store.getters['group/isLoading'];
+  });
+
   const groups = computed(()=>{
-    console.log("Usli ponovo da ispisemo grupe");
+    console.log(store.getters['group/getAllFilterGroup'](props.idCategories),props.idCategories);
     return store.state.group.groups != null ? store.getters['group/getAllFilterGroup'](props.idCategories) : null;
   })
 
   </script>
   
   <style scoped>
+  .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  color: white;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  background: #f8f9ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  font-size: 2.5rem;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 1rem 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.empty-title strong {
+  color: #6366f1;
+  font-weight: 700;
+}
+
+.empty-subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+  max-width: 400px;
+}
   .header-text{
     margin-top: 2rem;
   }

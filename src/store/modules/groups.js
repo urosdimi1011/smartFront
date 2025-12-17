@@ -5,11 +5,15 @@ export default {
     namespaced: true,
     state: () => ({
         groups: null,
-        filterGroups: null
+        filterGroups: null,
+        isLoading: false
     }),
     getters: {
         getAllGroups(state) {
             return state.groups;
+        },
+        isLoading(state) {
+            return state.isLoading;
         },
         getAllFilterGroup: (state,getters, rootState, rootGetters) => (id) => {
             const allDevices = rootGetters['device/getAllDevices'];
@@ -41,6 +45,9 @@ export default {
         }
     },
     mutations: {
+        setLoading(state, payload) {
+            state.isLoading = payload;
+        },
         setGroups(state, payload) {
             state.groups = payload;
         },
@@ -61,6 +68,9 @@ export default {
             if (group) {
                 group.name = updatedGroup.name;
             }
+        },
+        resetState(state) {
+            state.groups = [];
         }
     },
     actions: {
@@ -70,6 +80,17 @@ export default {
                     validateStatus: (status) => status < 300
                 });
                 commit('addGroup',response.data.group);
+                commit("device/updateDevices", response.data.group.devices, { root: true });
+                dispatch('assignDevicesToGroups');
+                return response;
+            }
+            catch (error) {
+                throw Error(error.response.data.message);
+            }
+        },
+        async changeOrderOfGroup(_,payload){
+            try {
+                const response = await api.post('/api/groups/reorder', {groups: payload});
                 return response;
             }
             catch (error) {
@@ -78,36 +99,44 @@ export default {
         },
         async getAllGroup({commit,dispatch }, id = null) {
             try {
+                commit('setLoading', true);
                 let response = null;
                 if (id == null) {
                     response = await api.get('/api/groups');
+                    console.log(response.data);
                     commit('setGroups', response.data.groups);
                     dispatch('assignDevicesToGroups');
-                    dispatch('filteringOrderInNewGroups',response.data.groups);
+                    // dispatch('filteringOrderInNewGroups',response.data.groups);
                 }
                 else {
                     response = await api.get("/api/groups?idCategory=" + parseInt(id));
                     commit('setFilterGroups', response.data.groups);
                 }
                 if (response) {
+                    commit('setLoading', false);
                     return response.data;
                 }
             }
             catch (error) {
+                commit('setLoading', false);
                 throw Error(error.response.data.message);
             }
         },
         async assignDevicesToGroups({ rootState, commit }) {
             const groups = rootState.group.groups;
             const allDevices = rootState.device.device;
-            const enrichedGroups = groups.map(group => {
-                return {
-                    ...group,
-                    devices: (allDevices && allDevices.length) ? allDevices.filter(device =>  device.groups && device.groups.some(g => g.id === group.id)): null
-                };
-            });
-            console.log(enrichedGroups);
-            commit('setGroups', enrichedGroups);
+            if(groups == null){
+                commit('setGroups', null);
+            }
+            else{
+                const enrichedGroups = groups.map(group => {
+                    return {
+                        ...group,
+                        devices: (allDevices && allDevices.length) ? allDevices.filter(device => device.groups && device.groups.some(g => g.id === group.id)): []
+                    };
+                });
+                commit('setGroups', enrichedGroups);
+            }
         },
         async setLocalItemFromIndexedDb({commit},payload){
             await setItem('localItems',payload);
@@ -131,14 +160,17 @@ export default {
         async AddDevicesInGroup({ dispatch }, payload) {
             const id = payload.id;
             const ids = payload.devices;
-            // console.log(id,{ids});
             try {
+                console.log("USLI DA PROMENIMO UREDJAE U GRUPI");
                 const response = await api.post(`/api/groups/${id}`, { ids });
-                await dispatch('device/getAllDevices', null, { root: true });
+                await dispatch('device/getAllDevices', {}, { root: true });
+                console.log(response.data);
                 await dispatch('assignDevicesToGroups');
+
                 return response.data;
             }
             catch (error) {
+                console.log(error);
                 throw Error(error.response.data.message);
             }
         },

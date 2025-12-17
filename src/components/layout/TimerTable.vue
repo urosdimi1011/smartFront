@@ -57,8 +57,9 @@
             </Column>
             <Column class="width-column-input" field="time" header="Vreme">
                 <template #editor="{ data, field }">
-                  {{data[field]}}
-                    <DatePicker name="time" class="width-column-input p-datepicker-time-picker-moj" v-model="data[field]" timeOnly :utcOffset="0"/>
+                    {{ data[field] }}
+                    <DatePicker name="time" class="width-column-input p-datepicker-time-picker-moj"
+                        v-model="data[field]" timeOnly :utcOffset="0" />
                 </template>
             </Column>
             <Column field="active" header="Aktivan">
@@ -85,7 +86,8 @@
         <p>Trenutno nema setovanih tajmera</p>
     </div>
     <div class="spinner-container" v-if="timers == null">
-        <ProgressSpinner />
+        <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
+            aria-label="Custom ProgressSpinner" />
     </div>
     <modal-layout :modal-content="modalContent" :visible="isOpen" @close="close()" :confirm="confirm">
 
@@ -102,7 +104,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 import InputText from 'primevue/inputtext';
 import modalLayout from '@/components/modalLayout.vue';
 import DatePicker from 'primevue/datepicker';
-import { onMounted, ref, computed,defineEmits } from 'vue';
+import { onMounted, ref, computed, defineEmits } from 'vue';
 import store from '@/store';
 import { useToast } from 'vue-toastification';
 import FormInput from '@/components/ui/FormInput.vue';
@@ -117,7 +119,7 @@ const idTimer = ref(0);
 const timers = computed(() => {
     return store.getters['timer/getListOfTimer'];
 });
-const { isOpen, show, close,modalContent,confirm } = showModal();
+const { isOpen, show, close, modalContent, confirm } = showModal();
 
 const days = [
     { label: "Ponedeljak", value: 1 },
@@ -170,15 +172,15 @@ const removeTimer = (id) => {
     show(`Da li ste sigurni da zelite da obrisete tajmer?`, removeTimerRealy);
 }
 const removeTimerRealy = async () => {
-  console.log(":USlii");
+    console.log(":USlii");
     try {
-        const response = await store.dispatch('timer/deleteTimer',{id : idTimer.value});
+        const response = await store.dispatch('timer/deleteTimer', { id: idTimer.value });
         toast.success(response.data.message, {
             timeout: 3000
         });
         emit('close');
     }
-    catch(error){
+    catch (error) {
         toast.error(error.message, {
             timeout: 3000
         });
@@ -223,9 +225,11 @@ button {
     background-color: transparent;
     border: none;
 }
-.width-column-input{
-  width: 200px !important;
+
+.width-column-input {
+    width: 200px !important;
 }
+
 table button {
     cursor: pointer;
 }

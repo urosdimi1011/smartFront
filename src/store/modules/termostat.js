@@ -28,7 +28,8 @@ export default {
         },
         async addTermostat(_dispatch,payload) {
             try {
-                return await api.post(`/api/termostat`, payload);
+                const response =  await api.post(`/api/termostat`, payload);
+                return response.data;
             } catch (error) {
                 throw Error(error.response.data.message);
             }
@@ -36,6 +37,14 @@ export default {
         async addTermostatToDevice(_dispatch,payload){
             try{
                 return await api.post(`/api/termostat/${payload.idTermostat}`,{idDevice:payload.id});
+            }
+            catch(error){
+                throw Error(error.response.data.message);
+            }
+        },
+        async editTermostatOfDevice(_dispatch,payload){
+            try{
+                return await api.patch(`/api/termostat/${payload.idTermostat}`,{idDevice:payload.id});
             }
             catch(error){
                 throw Error(error.response.data.message);
